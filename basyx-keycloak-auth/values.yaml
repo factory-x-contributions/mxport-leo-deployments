@@ -1,0 +1,363 @@
+global:
+  security:
+    allowInsecureImages: true # needed because bitnami is now in bitnamilegacy
+
+aas-basyx-v2-full:
+  mqtt:
+    enabled: false
+
+  mongodb:
+    enabled: false
+
+  keycloak:
+    enabled: true
+    image:
+      repository: bitnamilegacy/keycloak
+      tag: 26.3.3
+    postgresql:
+      enabled: true
+      auth:
+        username: <path:factory-x-ci-cd/data/mx-leo-deployments#kc-pg-user>
+        password: <path:factory-x-ci-cd/data/mx-leo-deployments#kc-pg-pw>
+        database: <path:factory-x-ci-cd/data/mx-leo-deployments#kc-pg-db>
+      image:
+        repository: bitnamilegacy/postgresql
+        tag: 17.4.0-debian-12-r2
+    ingress:
+      enabled: true
+      ingressClassName: "nginx"
+      hostname: <path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-url>
+      tls: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/enable-cors: 'true'
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+    auth:
+      adminUser: <path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-user>
+      adminPassword: <path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-pw>
+    extraVolumes:
+      - name: basyx-keycloak-realm
+        configMap:
+          name: basyx-keycloak-realm
+      - name: test-realm
+        configMap:
+          name: test-realm
+    extraVolumeMounts:
+      - mountPath: /opt/keycloak/data/import/BaSyx-realm.json
+        subPath: BaSyx-realm.json
+        name: basyx-keycloak-realm
+      - mountPath: /opt/keycloak/data/import/test-realm.json
+        subPath: test-realm.json
+        name: test-realm
+
+    args: ["/bin/sh -c 'kc.sh import --dir /opt/keycloak/data/import; kc.sh start-dev --hostname-strict=false --proxy-headers=xforwarded --http-enabled=true --features=token-exchange'"]
+
+  aas-registry:
+    enabled: true
+    image:
+      # If Kafka is used, then the appropriate Bootstrap connection string must be provided.
+      name: eclipsebasyx/aas-registry-log-mem:2.0.0-SNAPSHOT
+      pullPolicy: IfNotPresent
+    service:
+      port: 8080
+    # Keep it null if not deploying a Kafka instance.
+    kafka:
+      connectionString: null
+    ingress:
+      enabled: true
+      host: "<path:factory-x-ci-cd/data/mx-leo-deployments#basyx-reg-url>"
+      tls: true
+      ingressClassName: "nginx"
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    config: |-
+      basyx.cors.allowed-origins=*
+      basyx.cors.allowed-methods=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+
+  sm-registry:
+    enabled: false
+
+  aas-discovery:
+    enabled: true
+    image:
+      name: eclipsebasyx/aas-discovery:2.0.0-SNAPSHOT
+      pullPolicy: IfNotPresent
+    service:
+      port: 8081
+    config: |-
+      server.port=8081
+      spring.application.name=AAS Discovery Service
+      logging.level.root=TRACE
+
+      basyx.aasdiscoveryservice.name=aas-discovery-service
+
+      basyx.backend=InMemory
+
+      basyx.cors.allowed-origins=*
+      basyx.cors.allowed-methods=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+
+      basyx.feature.authorization.enabled=true
+      basyx.feature.authorization.type=rbac
+      basyx.feature.authorization.jwtBearerTokenProvider=keycloak
+      basyx.feature.authorization.rbac.file=file:/application/rbac-rules.json
+      spring.security.oauth2.resourceserver.jwt.issuer-uri=https://<path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-url>/realms/BaSyx
+    ingress:
+      enabled: true
+      host: "<path:factory-x-ci-cd/data/mx-leo-deployments#basyx-disco-url>"
+      tls: true
+      ingressClassName: "nginx"
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+
+  # Also needs an ingress.
+  aas-environment:
+    enabled: true
+    image:
+      name: eclipsebasyx/aas-environment:2.0.0-SNAPSHOT
+      pullPolicy: Always
+    service:
+      port: 8081
+    config: |-
+      server.port=8081
+
+      basyx.backend = InMemory
+
+      # basyx.environment=file:aas
+
+      logging.level.root=DEBUG
+
+      basyx.cors.allowed-origins=*
+      basyx.cors.allowed-methods=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      basyx.aasrepository.feature.registryintegration=https://<path:factory-x-ci-cd/data/mx-leo-deployments#basyx-reg-url>
+      basyx.externalurl=https://<path:factory-x-ci-cd/data/mx-leo-deployments#basyx-env-url>
+      spring.servlet.multipart.max-file-size=128MB
+      spring.servlet.multipart.max-request-size=128MB
+
+      # basyx.aasrepository.feature.mqtt.enabled = true
+      # basyx.submodelrepository.feature.mqtt.enabled = true
+      # mqtt.clientId=basyx
+      # mqtt.hostname=<path:factory-x-ci-cd/data/mx-leo-deployments#broker-url>
+      # mqtt.protocol=wss
+      # mqtt.port=443
+      # mqtt.username=<path:factory-x-ci-cd/data/mx-leo-deployments#broker-user>
+      # mqtt.password=<path:factory-x-ci-cd/data/mx-leo-deployments#broker-pw>
+
+      basyx.feature.authorization.enabled = true
+      basyx.feature.authorization.type = rbac
+      basyx.feature.authorization.jwtBearerTokenProvider = keycloak
+      basyx.feature.authorization.rbac.file = file:/application/rbac-rules.json
+
+      spring.security.oauth2.resourceserver.jwt.issuer-uri = https://<path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-url>/realms/test
+
+      # spring.data.mongodb.uri=mongodb://mongodb
+      # spring.data.mongodb.port=27017
+      # spring.data.mongodb.database=factoryx-mongo-db
+      # spring.data.mongodb.username=<path:factory-x-ci-cd/data/mx-leo-deployments#mongodb-admin-user>
+      # spring.data.mongodb.password=<path:factory-x-ci-cd/data/mx-leo-deployments#mongodb-admin-pw>
+
+    ingress:
+      enabled: true
+      host: <path:factory-x-ci-cd/data/mx-leo-deployments#basyx-env-url>
+      tls: true
+      ingressClassName: "nginx"
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-body-size: 150m
+
+    rbac:
+      rules: |
+        [
+          {
+            "role": "admin",
+            "action": ["CREATE", "READ", "UPDATE", "DELETE" ],
+            "targetInformation": {
+              "@type": "concept-description",
+              "conceptDescriptionIds": "*"
+            }
+          },
+          {
+            "role": "admin",
+            "action": [ "CREATE", "READ", "UPDATE", "DELETE" ],
+            "targetInformation": {
+              "@type": "aas",
+              "aasIds": "*"
+            }
+          },
+          {
+            "role": "admin",
+            "action": [ "CREATE", "READ", "UPDATE", "DELETE", "EXECUTE" ],
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "admin",
+            "action": [ "CREATE", "READ", "UPDATE", "DELETE" ],
+            "targetInformation": {
+              "@type": "aas-environment",
+              "aasIds": "*",
+              "submodelIds": "*"
+            }
+          },
+          {
+            "role": "basyx-reader",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-reader-two",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-sme-reader",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": [
+                "specificSubmodelId",
+                "testSMId1",
+                "testSMId2"
+              ],
+              "submodelElementIdShortPaths": [
+                "testSMEIdShortPath1",
+                "smc2.specificSubmodelElementIdShort",
+                "testSMEIdShortPath2"
+              ]
+            }
+          },
+          {
+            "role": "basyx-sme-reader-two",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          },
+          {
+            "role": "basyx-updater",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-updater-two",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-sme-updater",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          },
+          {
+            "role": "basyx-sme-updater-two",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "smc2"
+            }
+          },
+          {
+            "role": "basyx-sme-updater-three",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "smc1.specificSubmodelElementIdShort-2"
+            }
+          },
+          {
+            "role": "basyx-file-sme-updater",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          },
+          {
+            "role": "basyx-deleter",
+            "action": "DELETE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-deleter-two",
+            "action": "DELETE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-executor",
+            "action": "EXECUTE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-executor-two",
+            "action": "EXECUTE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "square"
+            }
+          },
+          {
+            "role": "basyx-file-sme-reader",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          }
+        ]
+  
+  # Needs specific ingress.
+  aas-web-ui:
+    enabled: false

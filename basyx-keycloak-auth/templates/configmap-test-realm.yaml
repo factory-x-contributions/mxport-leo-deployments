@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-realm
+data:
+  test-realm.json: |-
+{{ .Files.Get "config/test-realm.json" | indent 4 }}
