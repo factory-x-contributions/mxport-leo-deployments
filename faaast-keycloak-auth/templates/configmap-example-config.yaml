@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-config
+  namespace: aas-local
+data:
+  example-config.json: |-
+{{ .Files.Get "config/example-aas/config.json" | indent 4 }}

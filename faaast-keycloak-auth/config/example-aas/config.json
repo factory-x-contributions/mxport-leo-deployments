@@ -1,0 +1,28 @@
+{
+    "core": {
+        "requestHandlerThreadPoolSize": 2
+    },
+    "endpoints": [
+        {
+            "@class": "de.fraunhofer.iosb.ilt.faaast.service.endpoint.http.HttpEndpoint",
+            "port": 8080,
+            "corsEnabled": true,
+            "sslEnabled": false
+        }
+    ],
+    "persistence": {
+        "initialModelFile": "/app/config/",
+        "@class": "de.fraunhofer.iosb.ilt.faaast.service.persistence.mongo.PersistenceMongo",
+        "connectionString": "mongodb://fx-mongodb-admin:fx-mongodb-pw@mongodb:27017",
+        "database": "faaast-database",
+        "override": "true"
+    },
+    "messageBus": {
+        "@class": "de.fraunhofer.iosb.ilt.faaast.service.messagebus.internal.MessageBusInternal",
+        "host": "",
+        "user": "",
+        "password": "",
+        "slimEvents": "true",
+        "eventCallbackAddress": ""
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "AllAccessPermissionRules": {
+        "rules": [
+            {
+                "ACL": {
+                    "ATTRIBUTES": [
+                        {
+                            "CLAIM": "client_id"
+                        }
+                    ],
+                    "RIGHTS": [
+                        "READ"
+                    ],
+                    "ACCESS": "ALLOW"
+                },
+                "OBJECTS": [
+                    {
+                        "ROUTE": "*"
+                    }
+                ],
+                "FORMULA": {
+                    "$eq": [
+                        {
+                            "$attribute": {
+                                "CLAIM": "client_id"
+                            }
+                        },
+                        {
+                            "$strVal": "test-client"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

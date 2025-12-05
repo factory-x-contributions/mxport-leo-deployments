@@ -1,0 +1,107 @@
+global:
+  security:
+    allowInsecureImages: true # needed because bitnami is now in bitnamilegacy
+
+keycloak:
+  enabled: true
+  fullnameOverride: faaast-keycloak
+  postgresql:
+    enabled: true
+    auth:
+      username: <path:factory-x-ci-cd/data/mx-leo-deployments#kc-pg-user>
+      password: <path:factory-x-ci-cd/data/mx-leo-deployments#kc-pg-pw>
+      database: <path:factory-x-ci-cd/data/mx-leo-deployments#kc-pg-db>
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/postgresql
+      tag: 17.4.0-debian-12-r2
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/keycloak
+    tag: latest
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostname: <path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-url>
+    pathType: Prefix
+    path: /
+  auth:
+    adminUser: <path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-user>
+    adminPassword: <path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-pw>
+  extraVolumes:
+    - name: test-realm
+      configMap:
+        name: test-realm
+  extraVolumeMounts:
+    - mountPath: /opt/keycloak/data/import/test-realm.json
+      subPath: test-realm.json
+      name: test-realm
+  args: 
+    - "/bin/sh"
+    - "-c" 
+    - "/opt/bitnami/keycloak/bin/kc.sh import --file /opt/keycloak/data/import/test-realm.json; /opt/bitnami/keycloak/bin/kc.sh start-dev --hostname-strict=false --proxy-headers=xforwarded --http-enabled=true --features=token-exchange"
+
+faaast-service:
+  messageBus:
+    class: "de.fraunhofer.iosb.ilt.faaast.service.messagebus.internal.MessageBusInternal"
+
+  ingress:
+    enabled: true
+    className: nginx
+    tls: []
+    hosts:
+      - host: faaast-service
+        paths:
+          - path: /
+            pathType: Prefix
+
+  seeding:
+    enabled: false
+
+  basicAuth:
+    enabled: false
+
+  endpoints:
+    - class: "de.fraunhofer.iosb.ilt.faaast.service.endpoint.http.HttpEndpoint"
+      port: 8080
+      corsEnabled: true
+      sslEnabled: false
+      jwkProvider: http://<path:factory-x-ci-cd/data/mx-leo-deployments#keycloak-url>/realms/test-realm/protocol/openid-connect/certs
+      includeErrorDetails: true
+      aclFolder: "/app/config/acl"
+      
+  volumes:
+    - name: acl-folder
+      configMap:
+        name: acl-folder
+    - name: example-config
+      configMap:
+        name: example-config
+    - name: example-model 
+      configMap:
+        name: example-model
+  volumeMounts:
+    - name: acl-folder
+      mountPath: /app/config/acl
+    - name: example-config
+      mountPath: /app/config/example-config.json
+      subPath: example-config.json
+    - name: example-model
+      mountPath: /app/config/model.json
+      subPath: model.json
+
+mongodb:
+  architecture: standalone
+  auth:
+    rootUser: <path:factory-x-ci-cd/data/mx-leo-deployments#mongodb-admin-user>
+    rootPassword: <path:factory-x-ci-cd/data/mx-leo-deployments#mongodb-admin-pw>
+  replicaSetName: <path:factory-x-ci-cd/data/mx-leo-deployments#mongodb-admin-pw>
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/mongodb
+    tag: latest
+
+  persistence:
+    size: 10Gi
+  service:
+    nameOverride: mongodb
