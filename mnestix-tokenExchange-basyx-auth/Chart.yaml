@@ -1,0 +1,6 @@
+apiVersion: v2
+name: mnestix-tokenexchange-basyx-auth
+description: Helm chart to deploy Mnestix Browser, Mnestix Proxy, Keycloak, MongoDB, and BaSyx AAS Environment
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

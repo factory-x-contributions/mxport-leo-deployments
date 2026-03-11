@@ -1,0 +1,451 @@
+{{- if .Values.mnestixBrowser.enabled }}
+{{ $browserName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-browser") }}
+{{ $proxyName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-proxy") }}
+{{ $keycloakName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "keycloak") }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $browserName }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mnestix-browser") | nindent 4 }}
+spec:
+  replicas: {{ .Values.mnestixBrowser.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mnestix-browser") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mnestix-browser") | nindent 8 }}
+      {{- with .Values.global.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: mnestix-browser
+          image: {{ printf "%s:%s" .Values.mnestixBrowser.image.repository .Values.mnestixBrowser.image.tag | quote }}
+          imagePullPolicy: {{ .Values.mnestixBrowser.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.mnestixBrowser.service.port }}
+              protocol: TCP
+          env:
+            - name: REGISTRY_API_URL
+              value: {{ .Values.mnestixBrowser.env.registryApiUrl | quote }}
+            - name: SUBMODEL_REGISTRY_API_URL
+              value: {{ .Values.mnestixBrowser.env.submodelRegistryApiUrl | quote }}
+            - name: DISCOVERY_API_URL
+              value: {{ default (printf "http://%s:%v/discovery" $proxyName .Values.mnestixProxy.service.port) .Values.mnestixBrowser.env.discoveryApiUrl | quote }}
+            - name: AAS_REPO_API_URL
+              value: {{ default (printf "http://%s:%v/plugfest5" $proxyName .Values.mnestixProxy.service.port) .Values.mnestixBrowser.env.aasRepoApiUrl | quote }}
+            - name: SUBMODEL_REPO_API_URL
+              value: {{ default (printf "http://%s:%v/plugfest5" $proxyName .Values.mnestixProxy.service.port) .Values.mnestixBrowser.env.submodelRepoApiUrl | quote }}
+            - name: CONCEPT_DESCRIPTION_REPO_API_URL
+              value: {{ default (printf "http://%s:%v/plugfest5" $proxyName .Values.mnestixProxy.service.port) .Values.mnestixBrowser.env.conceptDescriptionRepoApiUrl | quote }}
+            - name: SERIALIZATION_API_URL
+              value: {{ default (printf "http://%s:%v/plugfest5" $proxyName .Values.mnestixProxy.service.port) .Values.mnestixBrowser.env.serializationApiUrl | quote }}
+            - name: MNESTIX_AAS_GENERATOR_API_URL
+              value: {{ default (printf "http://%s:%v" $proxyName .Values.mnestixProxy.service.port) .Values.mnestixBrowser.env.aasGeneratorApiUrl | quote }}
+            - name: MNESTIX_BACKEND_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: backendApiKey
+            - name: AAS_LIST_FEATURE_FLAG
+              value: {{ .Values.mnestixBrowser.env.aasListFeatureFlag | quote }}
+            - name: TRANSFER_FEATURE_FLAG
+              value: {{ .Values.mnestixBrowser.env.transferFeatureFlag | quote }}
+            - name: COMPARISON_FEATURE_FLAG
+              value: {{ .Values.mnestixBrowser.env.comparisonFeatureFlag | quote }}
+            - name: PRODUCT_VIEW_FEATURE_FLAG
+              value: {{ .Values.mnestixBrowser.env.productViewFeatureFlag | quote }}
+            - name: AUTHENTICATION_FEATURE_FLAG
+              value: {{ .Values.mnestixBrowser.env.authenticationFeatureFlag | quote }}
+            - name: NEXTAUTH_URL
+              value: {{ .Values.mnestixBrowser.env.nextAuthUrl | quote }}
+            - name: KEYCLOAK_ENABLED
+              value: {{ .Values.mnestixBrowser.env.keycloakEnabled | quote }}
+            - name: KEYCLOAK_CLIENT_ID
+              value: {{ .Values.mnestixBrowser.env.keycloakClientId | quote }}
+            - name: KEYCLOAK_ISSUER
+              value: {{ default (printf "http://%s:%v" $keycloakName .Values.keycloak.service.httpPort) .Values.mnestixBrowser.env.keycloakIssuer | quote }}
+            - name: KEYCLOAK_LOCAL_URL
+              value: {{ .Values.mnestixBrowser.env.keycloakLocalUrl | quote }}
+            - name: KEYCLOAK_REALM
+              value: {{ .Values.mnestixBrowser.env.keycloakRealm | quote }}
+            - name: LOCK_TIMESERIES_PERIOD_FEATURE_FLAG
+              value: {{ .Values.mnestixBrowser.env.lockTimeseriesPeriodFeatureFlag | quote }}
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: nextAuthSecret
+            - name: SECRET_ENC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: secretEncKey
+            - name: IMPRINT_URL
+              value: {{ .Values.mnestixBrowser.env.imprintUrl | quote }}
+            - name: DATA_PRIVACY_URL
+              value: {{ .Values.mnestixBrowser.env.dataPrivacyUrl | quote }}
+            - name: BASYX_RBAC_ENABLED
+              value: {{ .Values.mnestixBrowser.env.basyxRbacEnabled | quote }}
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          {{- with .Values.mnestixBrowser.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.mnestixBrowser.persistence.enabled }}
+          volumeMounts:
+            - name: mnestix-browser-data
+              mountPath: /app/prisma/database
+          {{- end }}
+      {{- if .Values.mnestixBrowser.persistence.enabled }}
+      volumes:
+        - name: mnestix-browser-data
+          persistentVolumeClaim:
+            claimName: {{ include "mnestix-tokenexchange-basyx-auth.componentDataPvcName" (dict "root" . "component" "mnestix-browser") }}
+      {{- end }}
+{{- end }}
+{{- if .Values.mnestixProxy.enabled }}
+---
+{{ $proxyName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-proxy") }}
+{{ $keycloakName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "keycloak") }}
+{{ $defaultOpenIdIssuer := printf "https://%s:%v/realms/%s" $keycloakName .Values.keycloak.service.httpsPort .Values.keycloak.realm.name }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $proxyName }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mnestix-proxy") | nindent 4 }}
+spec:
+  replicas: {{ .Values.mnestixProxy.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mnestix-proxy") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mnestix-proxy") | nindent 8 }}
+      {{- with .Values.global.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: mnestix-proxy
+          image: {{ printf "%s:%s" .Values.mnestixProxy.image.repository .Values.mnestixProxy.image.tag | quote }}
+          imagePullPolicy: {{ .Values.mnestixProxy.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.mnestixProxy.service.port }}
+              protocol: TCP
+          env:
+            - name: CustomerEndpointsSecurity__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: backendApiKey
+            - name: AzureAd__EnableAzureAdAuth
+              value: {{ .Values.mnestixProxy.env.azureAdEnableAzureAdAuth | quote }}
+            - name: OpenId__EnableOpenIdAuth
+              value: {{ .Values.mnestixProxy.env.openIdEnableOpenIdAuth | quote }}
+            - name: OpenId__Issuer
+              value: {{ default $defaultOpenIdIssuer .Values.mnestixProxy.env.openIdIssuer | quote }}
+            - name: OpenId__ClientID
+              value: {{ .Values.mnestixProxy.env.openIdClientId | quote }}
+            - name: OpenId__RequireHttpsMetadata
+              value: {{ .Values.mnestixProxy.env.openIdRequireHttpsMetadata | quote }}
+            - name: ASPNETCORE_URLS
+              value: {{ .Values.mnestixProxy.env.aspNetCoreUrls | quote }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.mnestixProxy.health.path }}
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.mnestixProxy.health.path }}
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          {{- with .Values.mnestixProxy.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
+{{- if .Values.keycloak.enabled }}
+---
+{{ $keycloakName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "keycloak") }}
+{{ $defaultIssuerBaseUri := printf "https://%s:%v" $keycloakName .Values.keycloak.service.httpsPort }}
+{{ $realmConfigMapExists := or .Values.keycloak.realm.createConfigMap .Values.keycloak.realm.configMapName }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $keycloakName }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "keycloak") | nindent 4 }}
+spec:
+  replicas: {{ .Values.keycloak.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "keycloak") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "keycloak") | nindent 8 }}
+      {{- with .Values.global.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: keycloak
+          image: {{ printf "%s:%s" .Values.keycloak.image.repository .Values.keycloak.image.tag | quote }}
+          imagePullPolicy: {{ .Values.keycloak.image.pullPolicy }}
+          {{- with .Values.keycloak.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.keycloak.service.httpPort }}
+              protocol: TCP
+            - name: https
+              containerPort: {{ .Values.keycloak.service.httpsPort }}
+              protocol: TCP
+          env:
+            - name: KEYCLOAK_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: keycloakAdminUser
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: keycloakAdminPassword
+            - name: KC_HOSTNAME
+              value: {{ .Values.keycloak.env.hostname | quote }}
+            - name: KC_SPI_INITIALIZER_ISSUER_BASE_URI
+              value: {{ default $defaultIssuerBaseUri .Values.keycloak.env.spiInitializerIssuerBaseUri | quote }}
+            - name: KC_HEALTH_ENABLED
+              value: {{ .Values.keycloak.env.healthEnabled | quote }}
+            - name: KC_HTTP_ENABLED
+              value: {{ .Values.keycloak.env.httpEnabled | quote }}
+            - name: KC_HTTPS_CERTIFICATE_FILE
+              value: {{ .Values.keycloak.env.httpsCertificateFile | quote }}
+            - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+              value: {{ .Values.keycloak.env.httpsCertificateKeyFile | quote }}
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 40
+            periodSeconds: 20
+          {{- with .Values.keycloak.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: keycloak-tls
+              mountPath: /opt/keycloak/conf
+              readOnly: true
+            {{- if $realmConfigMapExists }}
+            - name: keycloak-realm
+              mountPath: {{ printf "/opt/keycloak/data/import/%s" .Values.keycloak.realm.fileName }}
+              subPath: {{ .Values.keycloak.realm.fileName }}
+              readOnly: true
+            {{- end }}
+      volumes:
+        - name: keycloak-tls
+          secret:
+            secretName: {{ include "mnestix-tokenexchange-basyx-auth.keycloakTlsSecretName" . }}
+        {{- if $realmConfigMapExists }}
+        - name: keycloak-realm
+          configMap:
+            name: {{ include "mnestix-tokenexchange-basyx-auth.keycloakRealmConfigMapName" . }}
+        {{- end }}
+{{- end }}
+{{- if .Values.mongodb.enabled }}
+---
+{{ $mongodbName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mongodb") }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $mongodbName }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mongodb") | nindent 4 }}
+spec:
+  replicas: {{ .Values.mongodb.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mongodb") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mongodb") | nindent 8 }}
+      {{- with .Values.global.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: mongodb
+          image: {{ printf "%s:%s" .Values.mongodb.image.repository .Values.mongodb.image.tag | quote }}
+          imagePullPolicy: {{ .Values.mongodb.image.pullPolicy }}
+          ports:
+            - name: mongodb
+              containerPort: {{ .Values.mongodb.service.port }}
+              protocol: TCP
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: mongodbRootUsername
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: mongodbRootPassword
+          readinessProbe:
+            tcpSocket:
+              port: mongodb
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: mongodb
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          {{- with .Values.mongodb.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.mongodb.persistence.enabled }}
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+          {{- end }}
+      {{- if .Values.mongodb.persistence.enabled }}
+      volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: {{ include "mnestix-tokenexchange-basyx-auth.componentDataPvcName" (dict "root" . "component" "mongodb") }}
+      {{- end }}
+{{- end }}
+{{- if .Values.aasEnvironment.enabled }}
+---
+{{ $aasName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "aas-environment") }}
+{{ $mongodbName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mongodb") }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $aasName }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "aas-environment") | nindent 4 }}
+spec:
+  replicas: {{ .Values.aasEnvironment.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "aas-environment") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "aas-environment") | nindent 8 }}
+      {{- with .Values.global.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: aas-environment
+          image: {{ printf "%s:%s" .Values.aasEnvironment.image.repository .Values.aasEnvironment.image.tag | quote }}
+          imagePullPolicy: {{ .Values.aasEnvironment.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.aasEnvironment.service.port }}
+              protocol: TCP
+          env:
+            - name: BASYX__BACKEND
+              value: {{ .Values.aasEnvironment.env.backend | quote }}
+            - name: SPRING__DATA__MONGODB__HOST
+              value: {{ $mongodbName | quote }}
+            - name: SPRING__DATA__MONGODB__DATABASE
+              value: {{ .Values.aasEnvironment.env.mongodbDatabase | quote }}
+            - name: SPRING__DATA__MONGODB__AUTHENTICATION_DATABASE
+              value: {{ .Values.aasEnvironment.env.mongodbAuthDatabase | quote }}
+            - name: SPRING__DATA__MONGODB__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: mongodbRootUsername
+            - name: SPRING__DATA__MONGODB__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
+                  key: mongodbRootPassword
+            - name: SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE
+              value: {{ .Values.aasEnvironment.env.maxFileSize | quote }}
+            - name: SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE
+              value: {{ .Values.aasEnvironment.env.maxRequestSize | quote }}
+            - name: BASYX_CORS_ALLOWED_ORIGINS
+              value: {{ .Values.aasEnvironment.env.corsAllowedOrigins | quote }}
+            - name: BASYX_CORS_ALLOWED_METHODS
+              value: {{ .Values.aasEnvironment.env.corsAllowedMethods | quote }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 40
+            periodSeconds: 20
+          {{- with .Values.aasEnvironment.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

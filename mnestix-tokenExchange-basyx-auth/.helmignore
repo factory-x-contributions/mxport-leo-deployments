@@ -1,0 +1,10 @@
+# VCS and editor files
+.git/
+.vscode/
+
+# Local run artifacts
+compose.yml
+wiki/
+
+# Build output not needed in chart package
+keycloak/initializer/target/

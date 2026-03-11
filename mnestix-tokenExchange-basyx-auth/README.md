@@ -124,3 +124,44 @@ dotnet build mnestix-proxy/mnestix-proxy.csproj -c Debug
 ```
 
 If the 8.0 SDK is not installed, the `dotnet` CLI will prompt accordingly. Install from https://dotnet.microsoft.com/download/dotnet/8.0.
+
+### Kubernetes Deployment (Helm)
+
+This folder now contains a complete Helm chart (`Chart.yaml`, `values.yaml`, `templates/`) to deploy the full stack:
+
+- Mnestix Browser
+- Mnestix Proxy
+- Keycloak
+- MongoDB
+- BaSyx AAS Environment
+
+1. Build and push the custom images you want to use in the cluster.
+
+```bash
+# From mnestix-tokenExchange-basyx-auth
+docker build -t <registry>/mnestix-proxy:1.0.0-fx -f Dockerfile .
+docker build -t <registry>/mnestix-keycloak-fx:24.0.4 ./keycloak
+
+docker push <registry>/mnestix-proxy:1.0.0-fx
+docker push <registry>/mnestix-keycloak-fx:24.0.4
+```
+
+2. Install or upgrade the release.
+
+```bash
+helm upgrade --install mnestix . \
+  --set mnestixProxy.image.repository=<registry>/mnestix-proxy \
+  --set mnestixProxy.image.tag=1.0.0-fx \
+  --set keycloak.image.repository=<registry>/mnestix-keycloak-fx \
+  --set keycloak.image.tag=24.0.4
+```
+
+3. Port-forward services for local access (if no ingress is configured).
+
+```bash
+kubectl port-forward svc/mnestix-mnestix-tokenexchange-basyx-auth-mnestix-browser 3000:3000
+kubectl port-forward svc/mnestix-mnestix-tokenexchange-basyx-auth-mnestix-proxy 5065:5065
+kubectl port-forward svc/mnestix-mnestix-tokenexchange-basyx-auth-keycloak 8080:8080
+```
+
+Adjust the generated service names if you install with a different Helm release name.
