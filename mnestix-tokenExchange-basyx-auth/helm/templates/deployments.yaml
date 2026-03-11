@@ -178,14 +178,12 @@ spec:
             - name: ASPNETCORE_URLS
               value: {{ .Values.mnestixProxy.env.aspNetCoreUrls | quote }}
           readinessProbe:
-            httpGet:
-              path: {{ .Values.mnestixProxy.health.path }}
+            tcpSocket:
               port: http
             initialDelaySeconds: 15
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: {{ .Values.mnestixProxy.health.path }}
+            tcpSocket:
               port: http
             initialDelaySeconds: 30
             periodSeconds: 20
@@ -408,18 +406,18 @@ spec:
           env:
             - name: BASYX__BACKEND
               value: {{ .Values.aasEnvironment.env.backend | quote }}
-            - name: SPRING__DATA__MONGODB__HOST
+            - name: SPRING_DATA_MONGODB_HOST
               value: {{ $mongodbName | quote }}
-            - name: SPRING__DATA__MONGODB__DATABASE
+            - name: SPRING_DATA_MONGODB_DATABASE
               value: {{ .Values.aasEnvironment.env.mongodbDatabase | quote }}
-            - name: SPRING__DATA__MONGODB__AUTHENTICATION_DATABASE
+            - name: SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE
               value: {{ .Values.aasEnvironment.env.mongodbAuthDatabase | quote }}
-            - name: SPRING__DATA__MONGODB__USERNAME
+            - name: SPRING_DATA_MONGODB_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}
                   key: mongodbRootUsername
-            - name: SPRING__DATA__MONGODB__PASSWORD
+            - name: SPRING_DATA_MONGODB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "mnestix-tokenexchange-basyx-auth.appSecretName" . }}

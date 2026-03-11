@@ -102,6 +102,7 @@ keycloak:
     tag: "24.0.4"
     pullPolicy: IfNotPresent
   command:
+    - /opt/keycloak/bin/kc.sh
     - start-dev
     - --import-realm
   auth:
@@ -124,14 +125,14 @@ keycloak:
     name: ""
     crt: ""
     key: ""
-    crtFile: keycloak/certs/server.crt
-    keyFile: keycloak/certs/server.key
+    crtFile: files/keycloak/certs/server.crt
+    keyFile: files/keycloak/certs/server.key
   realm:
     name: Mnestix
     createConfigMap: true
     configMapName: ""
     fileName: Mnestix-realm.json
-    sourceFile: keycloak/realm/Mnestix-realm.json
+    sourceFile: files/keycloak/realm/Mnestix-realm.json
     content: ""
   ingress:
     enabled: false

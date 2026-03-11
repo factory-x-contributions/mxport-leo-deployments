@@ -19,12 +19,24 @@
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" -}}
 {{- end -}}
 
+{{- define "mnestix-tokenexchange-basyx-auth.nameWithSuffix" -}}
+{{- $base := .base -}}
+{{- $suffix := .suffix -}}
+{{- $maxBaseLen := sub 63 (add 1 (len $suffix)) -}}
+{{- if lt $maxBaseLen 1 -}}
+{{- $suffix | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $trimmedBase := $base | trunc (int $maxBaseLen) | trimSuffix "-" -}}
+{{- printf "%s-%s" $trimmedBase $suffix | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "mnestix-tokenexchange-basyx-auth.componentName" -}}
-{{- printf "%s-%s" (include "mnestix-tokenexchange-basyx-auth.fullname" .root) .component | trunc 63 | trimSuffix "-" -}}
+{{- include "mnestix-tokenexchange-basyx-auth.nameWithSuffix" (dict "base" (include "mnestix-tokenexchange-basyx-auth.fullname" .root) "suffix" .component) -}}
 {{- end -}}
 
 {{- define "mnestix-tokenexchange-basyx-auth.componentDataPvcName" -}}
-{{- printf "%s-data" (include "mnestix-tokenexchange-basyx-auth.componentName" .) | trunc 63 | trimSuffix "-" -}}
+{{- include "mnestix-tokenexchange-basyx-auth.nameWithSuffix" (dict "base" (include "mnestix-tokenexchange-basyx-auth.fullname" .root) "suffix" (printf "%s-data" .component)) -}}
 {{- end -}}
 
 {{- define "mnestix-tokenexchange-basyx-auth.labels" -}}
@@ -43,21 +55,21 @@ app.kubernetes.io/component: {{ .component }}
 {{- end -}}
 
 {{- define "mnestix-tokenexchange-basyx-auth.appSecretName" -}}
-{{- printf "%s-app-secrets" (include "mnestix-tokenexchange-basyx-auth.fullname" .) -}}
+{{- include "mnestix-tokenexchange-basyx-auth.nameWithSuffix" (dict "base" (include "mnestix-tokenexchange-basyx-auth.fullname" .) "suffix" "app-secrets") -}}
 {{- end -}}
 
 {{- define "mnestix-tokenexchange-basyx-auth.keycloakTlsSecretName" -}}
 {{- if .Values.keycloak.tlsSecret.name -}}
-{{- .Values.keycloak.tlsSecret.name -}}
+{{- .Values.keycloak.tlsSecret.name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-keycloak-tls" (include "mnestix-tokenexchange-basyx-auth.fullname" .) -}}
+{{- include "mnestix-tokenexchange-basyx-auth.nameWithSuffix" (dict "base" (include "mnestix-tokenexchange-basyx-auth.fullname" .) "suffix" "keycloak-tls") -}}
 {{- end -}}
 {{- end -}}
 
 {{- define "mnestix-tokenexchange-basyx-auth.keycloakRealmConfigMapName" -}}
 {{- if .Values.keycloak.realm.configMapName -}}
-{{- .Values.keycloak.realm.configMapName -}}
+{{- .Values.keycloak.realm.configMapName | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-keycloak-realm" (include "mnestix-tokenexchange-basyx-auth.fullname" .) -}}
+{{- include "mnestix-tokenexchange-basyx-auth.nameWithSuffix" (dict "base" (include "mnestix-tokenexchange-basyx-auth.fullname" .) "suffix" "keycloak-realm") -}}
 {{- end -}}
 {{- end -}}
