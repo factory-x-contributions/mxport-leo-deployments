@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-server-config
+data:
+  server-config.yml: |
+{{ .Files.Get "server-config.yaml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-filter-config
+data:
+  filter-config.yml: |
+{{ .Files.Get "filter-config.yaml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-trusted-list
+data:
+  signed_example_trusted_list.xml: |
+{{ .Files.Get "trusted-list/signed_example_trusted_list.xml" | indent 4 }}
+  19612_xsd.xsd: |
+{{ .Files.Get "trusted-list/19612_xsd.xsd" | indent 4 }}
+  rsa_public.pem: |
+{{ .Files.Get "trusted-list/rsa_public.pem" | indent 4 }}
