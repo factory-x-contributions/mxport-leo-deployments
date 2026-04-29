@@ -3,11 +3,11 @@
     "enabled": true,
     "clients": [
         {
-            "clientId": "<path:factory-x-ci-cd/data/async-aas#keycloak-rabbitmq-mqtt-clientid>",
+            "clientId": "<path:factory-x-ci-cd/data/blueprint-leo#keycloak-rabbitmq-mqtt-clientid>",
             "enabled": true,
             "protocol": "openid-connect",
             "clientAuthenticatorType": "client-secret",
-            "secret": "<path:factory-x-ci-cd/data/async-aas#keycloak-rabbitmq-mqtt-clientsecret>",
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#keycloak-rabbitmq-mqtt-clientsecret>",
             "serviceAccountsEnabled": true,
             "standardFlowEnabled": false,
             "directAccessGrantsEnabled": false,

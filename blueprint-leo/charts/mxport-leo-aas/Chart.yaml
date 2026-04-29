@@ -20,6 +20,10 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     alias: mongodb
     condition: mongodb.enabled
+  - name: company-lookup
+    version: 0.1.0
+    repository: "file://../company-lookup"
+    condition: company-lookup.enabled
   - name: rabbitmq
     version: 0.7.10
     repository: "oci://registry-1.docker.io/cloudpirates"
@@ -37,7 +41,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.6.14
+version: 0.6.15
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to

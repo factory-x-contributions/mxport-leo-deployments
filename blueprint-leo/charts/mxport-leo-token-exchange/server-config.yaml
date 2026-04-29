@@ -2,11 +2,11 @@
 #Properties here are especially used for issueing tokens
 serviceConfiguration:
   #Token Exchange Issuer name (used as "iss" claim in issued tokens)
-  issuer: http://localhost:9050/sts
+  issuer: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-url>
   #Choose filter manager by subject token (value: true) or actor token (value: false)
   chooseFilterManagerBySubjectToken: true
   #Alias of the signing key which is used as key-id in the issued tokens
-  signingKeyAlias: demo-key    
+  signingKeyAlias: demo-key
   tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
   plainkey:
     keyLocation: signingkey/private_key.pem
@@ -16,30 +16,30 @@ serviceConfiguration:
   forceOverwriteIatWithNow: false
   forceNewJti: false
 issuerSpecificConfiguration:
-  - issuer: https://auth0-style-issuer.com/
+  - issuer: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-keycloak-issuer>
     jwksValue: |
-      {"keys":[{"kty":"RSA","e":"AQAB","use":"sig","kid":"0b3eb6fd-15c6-4150-9848-af2a64f738e4","n":"nYHa-4YDOZ_6gpjTXxePv2-OWJ_EcMZPqrasi7NNsYpJNs7kn9hA-swUBIhJjQDFb8g9hKEKouv0enTNy4u_Cq2q5ejKJDmJWunXPccGUKKnsmFy9j0logu6z0n0ccLlaIKVSJH6llH6jLRu49xb3rnRjRVCbxvQsfjXH7fYyyok57-4c-YY_jrF8J_x-08wpIMNz3SdZYAvnZCRL9dgyuRosjIGB2F92uHNnv6-bH_ZtAze0tANxjvfyRMrXFgVQl6UhITinNTtXOCyP5ZNv_XyLIdvOmo7jGn_n0nY19w-VxZmazcFhA5vgjtVbHIvCiWN---rKsTym_TRmcK7wNdfV-g9uKrgXVRHUuDkdH5RRmkHU2JbKqahB9M_MGZiAlF7WEZ-MqfSKBkCWvKPP_4mOK8ktJNBPlX3Jp8V2radSNIY2IcMkjj4PXkDcWTZAfOyqw4gOMQsUaqTesdEahpsCuObznqIsCfaVipXrc84tgayQPGEQ6x88mjno1yP5PpulUPkSw8KA1FxlQt10q68MZ0qgvMqA1ahcamLDN3ydgd7TxqEvx_CPK3fDw9slcaP4qgXcDQwknCr2HObAEU9_hYqzcgaQyLINbogac0NYdmrgMzqzdzYvSWA8O1edUYZaXIHZF58Md6EKJdEeHy4ugBPRHimodKKGsxcCsM"}]}
+      <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-keycloak-jwks>
     connectionTimeoutInMs: 20000
-    readTimeoutInMs: 20000       
+    readTimeoutInMs: 20000
     tokenScopeClaimName: scope
     propagateIssuerToValidators: true
     disableSubjectTokenClaimsSetValidator: false
     subjectTokenClaimsSetValidator:
       issuerRequired: true
       requiredScopes:
-        - https://localhost/token.exchange
+        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-exchange>
       requiredAudiences:
-        - https://localhost/token
+        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-audience>
       expiryClaimRequired: true
       expiryCheckDisabled: false
       nbfClaimRequired: false
       nbfCheckDisabled: false
       iatClaimRequired: false
       iatCheckDisabled: false
-    actorTokenRequired: false        
+    actorTokenRequired: false
     actorTokenClaimsSetValidator:
       issuerRequired: true
       requiredScopes:
-        - https://localhost/token.authentication
+        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-authentication>
       requiredAudiences:
-        - https://localhost/token
+        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-token>

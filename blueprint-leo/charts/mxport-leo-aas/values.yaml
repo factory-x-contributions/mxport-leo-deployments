@@ -4,7 +4,19 @@ faaast-registry:
     tag: 1.2.0-SNAPSHOT
     pullPolicy: Always
   ingress:
-    enabled: false
+    enabled: true
+    className: "nginx"
+    tls:
+      - hosts:
+          - <path:factory-x-ci-cd/data/blueprint-leo#faaast-registry-url>
+        secretName: faaast-registry-tls
+    hosts:
+      - host: <path:factory-x-ci-cd/data/blueprint-leo#faaast-registry-url>
+        paths:
+          - path: /
+            pathType: Prefix
+    basicAuth:
+      enabled: false
 
   # possible: q, v, vv, vvv
   # Important: Don't prefix a dash ("-")
@@ -45,8 +57,8 @@ faaast-service:
     host: "mongodb"
     port: "27017"
     database: "faaast-database"
-    username: "admin"
-    password: "admin"
+    username: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+    password: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
 
   endpoints:
     - class: "de.fraunhofer.iosb.ilt.faaast.service.endpoint.http.HttpEndpoint"
@@ -65,7 +77,17 @@ faaast-service:
     class: "de.fraunhofer.iosb.ilt.faaast.service.messagebus.internal.MessageBusInternal"
 
   ingress:
-    enabled: false
+    enabled: true
+    className: "nginx"
+    tls:
+      - hosts:
+          - <path:factory-x-ci-cd/data/blueprint-leo#faaast-service-url>
+        secretName: faaast-service-tls
+    hosts:
+      - host: <path:factory-x-ci-cd/data/blueprint-leo#faaast-service-url>
+        paths:
+          - path: /
+            pathType: Prefix
 
   seeding:
     enabled: false
@@ -97,22 +119,21 @@ aas-basyx-v2-full:
       image:
         repository: "bitnamilegacy/postgresql"
       auth:
-        username: "keycloak"
-        password: "keycloak"
-        database: "keycloak"
+        username: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-user>
+        password: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-pw>
+        database: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-db>
     ingress:
       enabled: true
       ingressClassName: "nginx"
-      hostname: "keycloak.local"
-      tls: false
-      enabled: false
+      hostname: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-url>
+      tls: true
       annotations:
         kubernetes.io/ingress.class: nginx
         cert-manager.io/cluster-issuer: letsencrypt-prod
         nginx.ingress.kubernetes.io/enable-cors: 'true'
     auth:
-      adminUser: "admin"
-      adminPassword: "admin"
+      adminUser: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-user>
+      adminPassword: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pw>
     extraVolumes:
       - name: basyx-realm
         configMap:
@@ -165,8 +186,8 @@ aas-basyx-v2-full:
 
       basyx.cors.allowed-origins=*
       basyx.cors.allowed-methods=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
-      basyx.aasrepository.feature.registryintegration=http://aas-environment:8081
-      basyx.externalurl=http://aas-environment:8081
+      basyx.aasrepository.feature.registryintegration=https://<path:factory-x-ci-cd/data/blueprint-leo#basyx-env-url>
+      basyx.externalurl=https://<path:factory-x-ci-cd/data/blueprint-leo#basyx-env-url>
       spring.servlet.multipart.max-file-size=128MB
       spring.servlet.multipart.max-request-size=128MB
 
@@ -179,17 +200,17 @@ aas-basyx-v2-full:
       basyx.feature.authorization.jwtBearerTokenProvider = keycloak
       basyx.feature.authorization.rbac.file = file:/application/rbac-rules.json
 
-      spring.security.oauth2.resourceserver.jwt.issuer-uri = http://keycloak:8080/realms/basyx
-      spring.data.mongodb.uri=mongodb://root:admin@mongodb
+      spring.security.oauth2.resourceserver.jwt.issuer-uri = https://<path:factory-x-ci-cd/data/blueprint-leo#keycloak-url>/realms/basyx
+      spring.data.mongodb.uri=mongodb://<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>:<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>@mongodb
       spring.data.mongodb.port=27017
       spring.data.mongodb.database=factoryx-mongo-db
-      spring.data.mongodb.username=root
-      spring.data.mongodb.password=admin
+      spring.data.mongodb.username=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+      spring.data.mongodb.password=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
 
     ingress:
-      enabled: false
-      host: "basyx-env.local"
-      tls: false
+      enabled: true
+      host: <path:factory-x-ci-cd/data/blueprint-leo#basyx-env-url>
+      tls: true
       ingressClassName: "nginx"
       annotations:
         kubernetes.io/ingress.class: nginx
@@ -423,8 +444,8 @@ aas-basyx-v2-full:
       spring.data.mongodb.database=factoryx-dtr-db
       spring.data.mongodb.host=mongodb
       spring.data.mongodb.port=27017
-      spring.data.mongodb.username=root
-      spring.data.mongodb.password=admin
+      spring.data.mongodb.username=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+      spring.data.mongodb.password=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
       basyx.backend=MongoDB
       basyx.aasdiscoveryservice.mongodb.collectionName=factoryx-dtr-db
       registry.type=MongoDB
@@ -442,8 +463,8 @@ mongodb:
     tag: "8.0.13"
     pullPolicy: IfNotPresent
   auth:
-    rootUser: admin
-    rootPassword: admin
+    rootUser: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+    rootPassword: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
   replicaSetName: rs0
 
   persistence:
@@ -456,3 +477,32 @@ rabbitmq:
     enabled: false
     certManager:
       enabled: false
+
+company-lookup:
+  enabled: true
+  image:
+    repository: eclipsebasyx/companylookup-go
+    tag: SNAPSHOT
+    pullPolicy: Always
+  server:
+    port: 5080
+  postgresql:
+    enabled: true
+    auth:
+      username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
+      password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
+      database: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db>
+  ingress:
+    enabled: true
+    host: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-url>
+    tls: true
+    ingressClassName: "nginx"
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-body-size: 150m
+  seedData:
+    enabled: true

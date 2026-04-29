@@ -22,3 +22,54 @@ spec:
         ports:
         - containerPort: {{ .Values.service.targetPort }}
           name: http
+        env:
+        {{- range $key, $value := .Values.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        livenessProbe:
+          httpGet:
+            path: /sts/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /sts/health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+        volumeMounts:
+        - name: server-config
+          mountPath: /app/server-config
+          readOnly: true
+        - name: filter-config
+          mountPath: /app/filter-config
+          readOnly: true
+        - name: signingkey
+          mountPath: /app/signingkey
+          readOnly: true
+        - name: trusted-list
+          mountPath: /app/trusted-list
+          readOnly: true
+        {{- with .Values.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      volumes:
+      - name: server-config
+        configMap:
+          name: {{ .Release.Name }}-server-config
+      - name: filter-config
+        configMap:
+          name: {{ .Release.Name }}-filter-config
+      - name: signingkey
+        secret:
+          secretName: {{ .Release.Name }}-signing-key
+      - name: trusted-list
+        configMap:
+          name: {{ .Release.Name }}-trusted-list

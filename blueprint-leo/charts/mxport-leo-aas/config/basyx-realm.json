@@ -24,7 +24,7 @@
       "credentials": [
         {
           "type": "password",
-          "value": "<path:factory-x-ci-cd/data/async-aas#basyx-user-password>",
+          "value": "<path:factory-x-ci-cd/data/blueprint-leo#basyx-user-password>",
           "temporary": false
         }
       ],
@@ -33,9 +33,9 @@
   ],
   "clients": [
     {
-      "clientId": "<path:factory-x-ci-cd/data/async-aas#basyx-clientid>",
+      "clientId": "<path:factory-x-ci-cd/data/blueprint-leo#basyx-clientid>",
       "enabled": true,
-      "secret": "<path:factory-x-ci-cd/data/async-aas#basyx-clientsecret>",
+      "secret": "<path:factory-x-ci-cd/data/blueprint-leo#basyx-clientsecret>",
       "publicClient": false,
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
