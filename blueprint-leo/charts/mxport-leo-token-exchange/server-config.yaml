@@ -2,7 +2,7 @@
 #Properties here are especially used for issueing tokens
 serviceConfiguration:
   #Token Exchange Issuer name (used as "iss" claim in issued tokens)
-  issuer: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-url>
+  issuer: https://sts.factory-x.catena-x.net/sts
   #Choose filter manager by subject token (value: true) or actor token (value: false)
   chooseFilterManagerBySubjectToken: true
   #Alias of the signing key which is used as key-id in the issued tokens
@@ -16,7 +16,7 @@ serviceConfiguration:
   forceOverwriteIatWithNow: false
   forceNewJti: false
 issuerSpecificConfiguration:
-  - issuer: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-keycloak-issuer>
+  - issuer: https://keycloak.factory-x.catena-x.net/realms/fa3st
     jwksValue: |
       <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-keycloak-jwks>
     connectionTimeoutInMs: 20000
@@ -27,9 +27,9 @@ issuerSpecificConfiguration:
     subjectTokenClaimsSetValidator:
       issuerRequired: true
       requiredScopes:
-        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-exchange>
+        - exchange
       requiredAudiences:
-        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-audience>
+        - sts
       expiryClaimRequired: true
       expiryCheckDisabled: false
       nbfClaimRequired: false
@@ -40,6 +40,6 @@ issuerSpecificConfiguration:
     actorTokenClaimsSetValidator:
       issuerRequired: true
       requiredScopes:
-        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-authentication>
+        - authentication
       requiredAudiences:
-        - <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-scope-token>
+        - token

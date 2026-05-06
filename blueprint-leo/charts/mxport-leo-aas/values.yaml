@@ -8,10 +8,10 @@ faaast-registry:
     className: "nginx"
     tls:
       - hosts:
-          - <path:factory-x-ci-cd/data/blueprint-leo#faaast-registry-url>
+          - fa3st-registry.factory-x.catena-x.net
         secretName: faaast-registry-tls
     hosts:
-      - host: <path:factory-x-ci-cd/data/blueprint-leo#faaast-registry-url>
+      - host: fa3st-registry.factory-x.catena-x.net
         paths:
           - path: /
             pathType: Prefix
@@ -71,7 +71,7 @@ faaast-service:
       sslEnabled: false
       security:
         enabled: true
-        jwkProvider: "http://token-exchange:9050/sts/jwks"
+        jwkProvider: "http://token-exchange-provider:9050/sts/jwks"
 
   messageBus:
     class: "de.fraunhofer.iosb.ilt.faaast.service.messagebus.internal.MessageBusInternal"
@@ -81,10 +81,10 @@ faaast-service:
     className: "nginx"
     tls:
       - hosts:
-          - <path:factory-x-ci-cd/data/blueprint-leo#faaast-service-url>
+          - fa3st-service.factory-x.catena-x.net
         secretName: faaast-service-tls
     hosts:
-      - host: <path:factory-x-ci-cd/data/blueprint-leo#faaast-service-url>
+      - host: fa3st-service.factory-x.catena-x.net
         paths:
           - path: /
             pathType: Prefix
@@ -92,8 +92,9 @@ faaast-service:
   seeding:
     enabled: false
 
-mxport-leo-token-exchange:
+mxport-leo-token-exchange-provider:
   enabled: true
+  fullnameOverride: "token-exchange-provider"
   replicaCount: 1
   image:
     repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
@@ -103,6 +104,103 @@ mxport-leo-token-exchange:
     type: ClusterIP
     port: 9050
     targetPort: 9050
+  signingKeySecret: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-provider-private-key>
+  serverConfig: |
+    serviceConfiguration:
+      issuer: https://sts-provider.factory-x.catena-x.net/sts
+      chooseFilterManagerBySubjectToken: true
+      signingKeyAlias: demo-key
+      tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
+      plainkey:
+        keyLocation: signingkey/private_key.pem
+        keyId: demo-key
+      outgoingTokenScopeClaimName: scope
+      forceOverwriteIssuerWithConfiguredValue: false
+      forceOverwriteIatWithNow: false
+      forceNewJti: false
+    issuerSpecificConfiguration:
+      - issuer: https://keycloak.factory-x.catena-x.net/realms/fa3st-provider
+        jwksValue: |
+          <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-provider-keycloak-jwks>
+        connectionTimeoutInMs: 20000
+        readTimeoutInMs: 20000
+        tokenScopeClaimName: scope
+        propagateIssuerToValidators: true
+        disableSubjectTokenClaimsSetValidator: false
+        subjectTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - exchange
+          requiredAudiences:
+            - sts-provider
+          expiryClaimRequired: true
+          expiryCheckDisabled: false
+          nbfClaimRequired: false
+          nbfCheckDisabled: false
+          iatClaimRequired: false
+          iatCheckDisabled: false
+        actorTokenRequired: false
+        actorTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - authentication
+          requiredAudiences:
+            - token
+
+mxport-leo-token-exchange-consumer:
+  enabled: true
+  fullnameOverride: "token-exchange-consumer"
+  replicaCount: 1
+  image:
+    repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
+    pullPolicy: Always
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 9050
+    targetPort: 9050
+  signingKeySecret: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-consumer-private-key>
+  serverConfig: |
+    serviceConfiguration:
+      issuer: https://sts-consumer.factory-x.catena-x.net/sts
+      chooseFilterManagerBySubjectToken: true
+      signingKeyAlias: demo-key
+      tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
+      plainkey:
+        keyLocation: signingkey/private_key.pem
+        keyId: demo-key
+      outgoingTokenScopeClaimName: scope
+      forceOverwriteIssuerWithConfiguredValue: false
+      forceOverwriteIatWithNow: false
+      forceNewJti: false
+    issuerSpecificConfiguration:
+      - issuer: https://keycloak.factory-x.catena-x.net/realms/fa3st-consumer
+        jwksValue: |
+          <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-consumer-keycloak-jwks>
+        connectionTimeoutInMs: 20000
+        readTimeoutInMs: 20000
+        tokenScopeClaimName: scope
+        propagateIssuerToValidators: true
+        disableSubjectTokenClaimsSetValidator: false
+        subjectTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - exchange
+          requiredAudiences:
+            - sts-consumer
+          expiryClaimRequired: true
+          expiryCheckDisabled: false
+          nbfClaimRequired: false
+          nbfCheckDisabled: false
+          iatClaimRequired: false
+          iatCheckDisabled: false
+        actorTokenRequired: false
+        actorTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - authentication
+          requiredAudiences:
+            - token
 
 aas-basyx-v2-full:
   # Deprecated legacy BaSyx Mosquitto configuration removed; RabbitMQ (with MQTT/WebSockets) is used instead.
@@ -125,7 +223,7 @@ aas-basyx-v2-full:
     ingress:
       enabled: true
       ingressClassName: "nginx"
-      hostname: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-url>
+      hostname: keycloak.factory-x.catena-x.net
       tls: true
       annotations:
         kubernetes.io/ingress.class: nginx
@@ -141,9 +239,12 @@ aas-basyx-v2-full:
       - name: rabbitmq-realm
         configMap:
           name: rabbitmq-realm
-      - name: fa3st-realm
+      - name: fa3st-provider-realm
         configMap:
-          name: fa3st-realm
+          name: fa3st-provider-realm
+      - name: fa3st-consumer-realm
+        configMap:
+          name: fa3st-consumer-realm
     extraVolumeMounts:
       - mountPath: /opt/bitnami/keycloak/data/import/basyx-realm.json
         subPath: basyx-realm.json
@@ -151,9 +252,12 @@ aas-basyx-v2-full:
       - mountPath: /opt/bitnami/keycloak/data/import/rabbitmq-realm.json
         subPath: rabbitmq-realm.json
         name: rabbitmq-realm
-      - mountPath: /opt/bitnami/keycloak/data/import/fa3st-realm.json
-        subPath: fa3st-realm.json
-        name: fa3st-realm
+      - mountPath: /opt/bitnami/keycloak/data/import/fa3st-provider-realm.json
+        subPath: fa3st-provider-realm.json
+        name: fa3st-provider-realm
+      - mountPath: /opt/bitnami/keycloak/data/import/fa3st-consumer-realm.json
+        subPath: fa3st-consumer-realm.json
+        name: fa3st-consumer-realm
     args: ["/bin/sh -c 'kc.sh start-dev --import-realm --hostname-strict=false --proxy-headers=xforwarded --http-enabled=true --features=token-exchange'"]
 
   aas-registry:
@@ -186,8 +290,8 @@ aas-basyx-v2-full:
 
       basyx.cors.allowed-origins=*
       basyx.cors.allowed-methods=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
-      basyx.aasrepository.feature.registryintegration=https://<path:factory-x-ci-cd/data/blueprint-leo#basyx-env-url>
-      basyx.externalurl=https://<path:factory-x-ci-cd/data/blueprint-leo#basyx-env-url>
+      basyx.aasrepository.feature.registryintegration=https://basyx-env.factory-x.catena-x.net
+      basyx.externalurl=https://basyx-env.factory-x.catena-x.net
       spring.servlet.multipart.max-file-size=128MB
       spring.servlet.multipart.max-request-size=128MB
 
@@ -200,7 +304,7 @@ aas-basyx-v2-full:
       basyx.feature.authorization.jwtBearerTokenProvider = keycloak
       basyx.feature.authorization.rbac.file = file:/application/rbac-rules.json
 
-      spring.security.oauth2.resourceserver.jwt.issuer-uri = https://<path:factory-x-ci-cd/data/blueprint-leo#keycloak-url>/realms/basyx
+      spring.security.oauth2.resourceserver.jwt.issuer-uri = https://keycloak.factory-x.catena-x.net/realms/basyx
       spring.data.mongodb.uri=mongodb://<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>:<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>@mongodb
       spring.data.mongodb.port=27017
       spring.data.mongodb.database=factoryx-mongo-db
@@ -209,7 +313,7 @@ aas-basyx-v2-full:
 
     ingress:
       enabled: true
-      host: <path:factory-x-ci-cd/data/blueprint-leo#basyx-env-url>
+      host: basyx-env.factory-x.catena-x.net
       tls: true
       ingressClassName: "nginx"
       annotations:
@@ -494,7 +598,7 @@ company-lookup:
       database: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db>
   ingress:
     enabled: true
-    host: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-url>
+    host: company-lookup.factory-x.catena-x.net
     tls: true
     ingressClassName: "nginx"
     annotations:

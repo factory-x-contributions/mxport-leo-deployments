@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ include "mxport-leo-token-exchange.fullname" . }}
   labels:
-    app.kubernetes.io/name: token-exchange
+    app.kubernetes.io/name: {{ include "mxport-leo-token-exchange.fullname" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: token-exchange
+      app: {{ include "mxport-leo-token-exchange.fullname" . }}
   template:
     metadata:
       labels:
-        app: token-exchange
+        app: {{ include "mxport-leo-token-exchange.fullname" . }}
     spec:
       containers:
-      - name: token-exchange
+      - name: {{ include "mxport-leo-token-exchange.fullname" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
@@ -63,13 +63,13 @@ spec:
       volumes:
       - name: server-config
         configMap:
-          name: {{ .Release.Name }}-server-config
+          name: {{ include "mxport-leo-token-exchange.fullname" . }}-server-config
       - name: filter-config
         configMap:
-          name: {{ .Release.Name }}-filter-config
+          name: {{ include "mxport-leo-token-exchange.fullname" . }}-filter-config
       - name: signingkey
         secret:
-          secretName: {{ .Release.Name }}-signing-key
+          secretName: {{ include "mxport-leo-token-exchange.fullname" . }}-signing-key
       - name: trusted-list
         configMap:
-          name: {{ .Release.Name }}-trusted-list
+          name: {{ include "mxport-leo-token-exchange.fullname" . }}-trusted-list

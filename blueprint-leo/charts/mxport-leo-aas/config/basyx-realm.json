@@ -33,7 +33,7 @@
   ],
   "clients": [
     {
-      "clientId": "<path:factory-x-ci-cd/data/blueprint-leo#basyx-clientid>",
+      "clientId": "basyx-client",
       "enabled": true,
       "secret": "<path:factory-x-ci-cd/data/blueprint-leo#basyx-clientsecret>",
       "publicClient": false,

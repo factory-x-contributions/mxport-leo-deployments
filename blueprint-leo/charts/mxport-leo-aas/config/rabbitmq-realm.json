@@ -3,7 +3,7 @@
     "enabled": true,
     "clients": [
         {
-            "clientId": "<path:factory-x-ci-cd/data/blueprint-leo#keycloak-rabbitmq-mqtt-clientid>",
+            "clientId": "keycloak-rabbitmq-mqtt",
             "enabled": true,
             "protocol": "openid-connect",
             "clientAuthenticatorType": "client-secret",

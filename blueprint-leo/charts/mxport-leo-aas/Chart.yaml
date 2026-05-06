@@ -11,7 +11,13 @@ dependencies:
   - name: mxport-leo-token-exchange
     version: 0.1.0
     repository: "file://../mxport-leo-token-exchange"
-    condition: mxport-leo-token-exchange.enabled
+    alias: mxport-leo-token-exchange-provider
+    condition: mxport-leo-token-exchange-provider.enabled
+  - name: mxport-leo-token-exchange
+    version: 0.1.0
+    repository: "file://../mxport-leo-token-exchange"
+    alias: mxport-leo-token-exchange-consumer
+    condition: mxport-leo-token-exchange-consumer.enabled
   - name: aas-basyx-v2-full
     version: 2.1.12
     repository: "https://eclipse-basyx.github.io/charts/"

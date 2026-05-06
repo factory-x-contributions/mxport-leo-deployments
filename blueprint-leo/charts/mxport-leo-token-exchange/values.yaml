@@ -8,7 +8,6 @@ image:
 imagePullSecrets: []
 
 nameOverride: ""
-
 fullnameOverride: ""
 
 serviceAccount:
@@ -63,6 +62,15 @@ env:
   TRUSTED_LIST_LOCATION: trusted-list/signed_example_trusted_list.xml
   TRUSTED_LIST_SCHEMA: trusted-list/19612_xsd.xsd
   TRUSTED_LIST_PUBLIC_KEY: trusted-list/rsa_public.pem
+
+# Override server-config.yml content (falls back to chart's server-config.yaml if empty)
+serverConfig: ""
+
+# Override filter-config.yml content (falls back to chart's filter-config.yaml if empty)
+filterConfig: ""
+
+# Vault path for the signing key private key
+signingKeySecret: "<path:factory-x-ci-cd/data/blueprint-leo#token-exchange-private-key>"
 
 volumeMounts:
   - name: server-config

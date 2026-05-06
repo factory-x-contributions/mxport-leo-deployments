@@ -1,11 +1,11 @@
 {
-    "realm": "fa3st",
+    "realm": "fa3st-provider",
     "enabled": true,
     "clients": [
         {
-            "clientId": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-rwx-all-clientid>",
+            "clientId": "fa3st-provider-rwx-all",
             "enabled": true,
-            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-rwx-all-clientsecret>",
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-provider-rwx-all-clientsecret>",
             "publicClient": false,
             "serviceAccountsEnabled": true,
             "standardFlowEnabled": false,
@@ -18,9 +18,9 @@
             ]
         },
         {
-            "clientId": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-rwx-nameplate-clientid>",
+            "clientId": "fa3st-provider-rwx-nameplate",
             "enabled": true,
-            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-rwx-nameplate-clientsecret>",
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-provider-rwx-nameplate-clientsecret>",
             "publicClient": false,
             "serviceAccountsEnabled": true,
             "standardFlowEnabled": false,
@@ -33,9 +33,9 @@
             ]
         },
         {
-            "clientId": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-r-all-clientid>",
+            "clientId": "fa3st-provider-r-all",
             "enabled": true,
-            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-r-all-clientsecret>",
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-provider-r-all-clientsecret>",
             "publicClient": false,
             "serviceAccountsEnabled": true,
             "standardFlowEnabled": false,
