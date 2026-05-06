@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "company-lookup.fullname" . }}
+  labels:
+    {{- include "company-lookup.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "company-lookup.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "company-lookup.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "company-lookup.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for PostgreSQL to be ready..."
+              until nc -z {{ include "company-lookup.postgresqlHost" . }} 5432; do
+                echo "PostgreSQL not ready, waiting..."
+                sleep 5
+              done
+              echo "PostgreSQL is ready!"
+        {{- if .Values.seedData.enabled }}
+        - name: seed-data
+          image: curlimages/curl:latest
+          command:
+            - /bin/sh
+            - /scripts/seed.sh
+          volumeMounts:
+            - name: seed-script
+              mountPath: /scripts
+            - name: seed-data
+              mountPath: /data
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SERVER_PORT
+              value: {{ .Values.server.port | quote }}
+            - name: CORS_ALLOWEDORIGINS
+              value: {{ .Values.cors.allowedOrigins | quote }}
+            - name: CORS_ALLOWEDHEADERS
+              value: {{ .Values.cors.allowedHeaders | quote }}
+            - name: CORS_ALLOWEDCREDENTIALS
+              value: {{ .Values.cors.allowedCredentials | quote }}
+            - name: CORS_ALLOWEDMETHODS
+              value: {{ .Values.cors.allowedMethods | quote }}
+            - name: POSTGRES_HOST
+              value: {{ include "company-lookup.postgresqlHost" . | quote }}
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.auth.username | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.postgresql.auth.password | quote }}
+            - name: POSTGRES_DBNAME
+              value: {{ .Values.postgresql.auth.database | quote }}
+            - name: POSTGRES_MAXOPENCONNECTIONS
+              value: "500"
+            - name: POSTGRES_MAXIDLECONNECTIONS
+              value: "500"
+            - name: POSTGRES_CONNMAXLIFETIMEMINUTES
+              value: "5"
+          ports:
+            - name: http
+              containerPort: {{ .Values.server.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        {{- if .Values.seedData.enabled }}
+        - name: seed-script
+          configMap:
+            name: {{ include "company-lookup.fullname" . }}-seed-script
+            defaultMode: 0755
+        - name: seed-data
+          configMap:
+            name: {{ include "company-lookup.fullname" . }}-seed-data
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

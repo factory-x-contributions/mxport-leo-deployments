@@ -1,0 +1,36 @@
+{
+    "realm": "fa3st-consumer",
+    "enabled": true,
+    "clients": [
+        {
+            "clientId": "fa3st-consumer-rwx-all",
+            "enabled": true,
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-consumer-rwx-all-clientsecret>",
+            "publicClient": false,
+            "serviceAccountsEnabled": true,
+            "standardFlowEnabled": false,
+            "directAccessGrantsEnabled": false,
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ]
+        },
+        {
+            "clientId": "fa3st-consumer-r-all",
+            "enabled": true,
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-consumer-r-all-clientsecret>",
+            "publicClient": false,
+            "serviceAccountsEnabled": true,
+            "standardFlowEnabled": false,
+            "directAccessGrantsEnabled": true,
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ]
+        }
+    ]
+}
