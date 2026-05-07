@@ -1,4 +1,5 @@
 faaast-registry:
+  fullnameOverride: "fx-leo-faaast-registry"
   image:
     repository: docker.io/fraunhoferiosb/faaast-registry
     tag: 1.2.0-SNAPSHOT
@@ -9,7 +10,7 @@ faaast-registry:
     tls:
       - hosts:
           - fa3st-registry.factory-x.catena-x.net
-        secretName: faaast-registry-tls
+        secretName: fx-leo-faaast-registry-tls
     hosts:
       - host: fa3st-registry.factory-x.catena-x.net
         paths:
@@ -37,14 +38,15 @@ faaast-registry:
           enabled: false
 
 faaast-service:
+  fullnameOverride: "fx-leo-faaast-service"
   image:
     repository: ghcr.io/factory-x-contributions/fa3st-service
     tag: fxleo
     pullPolicy: Always
 
   registry:
-    aasRegistryBaseUrl: "http://faaast-registry:443"
-    submodelRegistryBaseUrl: "http://faaast-registry:443"
+    aasRegistryBaseUrl: "http://fx-leo-faaast-registry:443"
+    submodelRegistryBaseUrl: "http://fx-leo-faaast-registry:443"
 
   # Optional: add auth header for registry synchronization requests (e.g. Basic auth for ingress-protected registry)
   registrySynchronization:
@@ -71,7 +73,7 @@ faaast-service:
       sslEnabled: false
       security:
         enabled: true
-        jwkProvider: "http://token-exchange-provider:9050/sts/jwks"
+        jwkProvider: "http://fx-leo-token-exchange-provider:9050/sts/jwks"
 
   messageBus:
     class: "de.fraunhofer.iosb.ilt.faaast.service.messagebus.internal.MessageBusInternal"
@@ -82,7 +84,7 @@ faaast-service:
     tls:
       - hosts:
           - fa3st-service.factory-x.catena-x.net
-        secretName: faaast-service-tls
+        secretName: fx-leo-faaast-service-tls
     hosts:
       - host: fa3st-service.factory-x.catena-x.net
         paths:
@@ -94,7 +96,7 @@ faaast-service:
 
 mxport-leo-token-exchange-provider:
   enabled: true
-  fullnameOverride: "token-exchange-provider"
+  fullnameOverride: "fx-leo-token-exchange-provider"
   replicaCount: 1
   image:
     repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
@@ -149,7 +151,7 @@ mxport-leo-token-exchange-provider:
 
 mxport-leo-token-exchange-consumer:
   enabled: true
-  fullnameOverride: "token-exchange-consumer"
+  fullnameOverride: "fx-leo-token-exchange-consumer"
   replicaCount: 1
   image:
     repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
@@ -212,6 +214,7 @@ aas-basyx-v2-full:
 
   keycloak:
     enabled: true
+    fullnameOverride: "fx-leo-basyx-keycloak"
     postgresql:
       enabled: true
       image:
@@ -233,31 +236,31 @@ aas-basyx-v2-full:
       adminUser: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-user>
       adminPassword: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pw>
     extraVolumes:
-      - name: basyx-realm
+      - name: fx-leo-basyx-realm
         configMap:
-          name: basyx-realm
-      - name: rabbitmq-realm
+          name: fx-leo-basyx-realm
+      - name: fx-leo-rabbitmq-realm
         configMap:
-          name: rabbitmq-realm
-      - name: fa3st-provider-realm
+          name: fx-leo-rabbitmq-realm
+      - name: fx-leo-fa3st-provider-realm
         configMap:
-          name: fa3st-provider-realm
-      - name: fa3st-consumer-realm
+          name: fx-leo-fa3st-provider-realm
+      - name: fx-leo-fa3st-consumer-realm
         configMap:
-          name: fa3st-consumer-realm
+          name: fx-leo-fa3st-consumer-realm
     extraVolumeMounts:
       - mountPath: /opt/bitnami/keycloak/data/import/basyx-realm.json
         subPath: basyx-realm.json
-        name: basyx-realm
+        name: fx-leo-basyx-realm
       - mountPath: /opt/bitnami/keycloak/data/import/rabbitmq-realm.json
         subPath: rabbitmq-realm.json
-        name: rabbitmq-realm
+        name: fx-leo-rabbitmq-realm
       - mountPath: /opt/bitnami/keycloak/data/import/fa3st-provider-realm.json
         subPath: fa3st-provider-realm.json
-        name: fa3st-provider-realm
+        name: fx-leo-fa3st-provider-realm
       - mountPath: /opt/bitnami/keycloak/data/import/fa3st-consumer-realm.json
         subPath: fa3st-consumer-realm.json
-        name: fa3st-consumer-realm
+        name: fx-leo-fa3st-consumer-realm
     args: ["/bin/sh -c 'kc.sh start-dev --import-realm --hostname-strict=false --proxy-headers=xforwarded --http-enabled=true --features=token-exchange'"]
 
   aas-registry:
@@ -305,7 +308,7 @@ aas-basyx-v2-full:
       basyx.feature.authorization.rbac.file = file:/application/rbac-rules.json
 
       spring.security.oauth2.resourceserver.jwt.issuer-uri = https://keycloak.factory-x.catena-x.net/realms/basyx
-      spring.data.mongodb.uri=mongodb://<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>:<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>@mongodb
+      spring.data.mongodb.uri=mongodb://<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>:<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>@fx-leo-mongodb
       spring.data.mongodb.port=27017
       spring.data.mongodb.database=factoryx-mongo-db
       spring.data.mongodb.username=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
@@ -546,7 +549,7 @@ aas-basyx-v2-full:
       spring.config.activate.on-profile=MongoDB
       spring.data.mongodb.authentication-database=admin
       spring.data.mongodb.database=factoryx-dtr-db
-      spring.data.mongodb.host=mongodb
+      spring.data.mongodb.host=fx-leo-mongodb
       spring.data.mongodb.port=27017
       spring.data.mongodb.username=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
       spring.data.mongodb.password=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
@@ -574,7 +577,7 @@ mongodb:
   persistence:
     size: 8Gi
   service:
-    nameOverride: mongodb
+    nameOverride: fx-leo-mongodb
 
 rabbitmq:
   ingress:
