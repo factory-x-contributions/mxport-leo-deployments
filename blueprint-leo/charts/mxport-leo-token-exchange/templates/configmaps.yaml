@@ -23,3 +23,5 @@ data:
 {{ .Files.Get "trusted-list/signed_example_trusted_list.xml" | indent 4 }}
   rsa_public.pem: |
 {{ .Files.Get "trusted-list/rsa_public.pem" | indent 4 }}
+  19612_xsd.xsd: |
+{{ .Files.Get "trusted-list/19612_xsd.xsd" | indent 4 }}
