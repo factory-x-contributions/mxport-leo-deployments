@@ -5,8 +5,7 @@ image:
   pullPolicy: IfNotPresent
   tag: "latest"
 
-imagePullSecrets:
-  - name: "{{ .Release.Name }}-mxport-leo-token-exchange-ghcr"
+imagePullSecrets: []
 
 nameOverride: ""
 fullnameOverride: ""
