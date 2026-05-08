@@ -595,6 +595,7 @@ company-lookup:
     port: 5080
   postgresql:
     enabled: true
+    fullnameOverride: "company-lookup-postgresql"
     auth:
       username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
       password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
