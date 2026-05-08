@@ -43,18 +43,6 @@ spec:
                 sleep 5
               done
               echo "PostgreSQL is ready!"
-        {{- if .Values.seedData.enabled }}
-        - name: seed-data
-          image: curlimages/curl:latest
-          command:
-            - /bin/sh
-            - /scripts/seed.sh
-          volumeMounts:
-            - name: seed-script
-              mountPath: /scripts
-            - name: seed-data
-              mountPath: /data
-        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -115,15 +103,6 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
-        {{- if .Values.seedData.enabled }}
-        - name: seed-script
-          configMap:
-            name: {{ include "company-lookup.fullname" . }}-seed-script
-            defaultMode: 0755
-        - name: seed-data
-          configMap:
-            name: {{ include "company-lookup.fullname" . }}-seed-data
-        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -15,6 +15,10 @@ spec:
       labels:
         app: {{ include "mxport-leo-token-exchange.fullname" . }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: {{ include "mxport-leo-token-exchange.fullname" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

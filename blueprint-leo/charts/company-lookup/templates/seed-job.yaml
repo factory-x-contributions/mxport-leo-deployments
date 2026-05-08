@@ -1,0 +1,39 @@
+{{- if .Values.seedData.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "company-lookup.fullname" . }}-seed
+  labels:
+    {{- include "company-lookup.labels" . | nindent 4 }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: hook-succeeded
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        {{- include "company-lookup.selectorLabels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed-data
+          image: curlimages/curl:latest
+          command:
+            - /bin/sh
+            - /scripts/seed.sh
+          volumeMounts:
+            - name: seed-script
+              mountPath: /scripts
+            - name: seed-data
+              mountPath: /data
+      volumes:
+        - name: seed-script
+          configMap:
+            name: {{ include "company-lookup.fullname" . }}-seed-script
+            defaultMode: 0755
+        - name: seed-data
+          configMap:
+            name: {{ include "company-lookup.fullname" . }}-seed-data
+{{- end }}
