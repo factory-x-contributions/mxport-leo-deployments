@@ -22,7 +22,6 @@ cors:
 
 postgresql:
   enabled: true
-  fullnameOverride: "company-lookup-postgresql"
   auth:
     username: admin
     password: admin123

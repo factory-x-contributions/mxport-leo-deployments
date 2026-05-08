@@ -593,9 +593,9 @@ company-lookup:
     pullPolicy: Always
   server:
     port: 5080
+  postgresqlHostOverride: "blueprint-leo-postgresql"
   postgresql:
     enabled: true
-    fullnameOverride: "company-lookup-postgresql"
     auth:
       username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
       password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>

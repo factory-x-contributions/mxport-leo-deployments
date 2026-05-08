@@ -63,7 +63,9 @@ Create the name of the service account to use
 PostgreSQL host — uses the Bitnami subchart service when embedded, or a custom host.
 */}}
 {{- define "company-lookup.postgresqlHost" -}}
-{{- if .Values.postgresql.enabled -}}
+{{- if .Values.postgresqlHostOverride -}}
+{{- .Values.postgresqlHostOverride -}}
+{{- else if .Values.postgresql.enabled -}}
 {{- printf "%s-postgresql" (include "company-lookup.fullname" .) -}}
 {{- else -}}
 {{- .Values.externalPostgresql.host | default "localhost" -}}
