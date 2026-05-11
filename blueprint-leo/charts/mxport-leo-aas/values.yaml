@@ -223,6 +223,13 @@ aas-basyx-v2-full:
         username: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-user>
         password: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-pw>
         database: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-db>
+      primary:
+        initdb:
+          scripts:
+            create_company_lookup_db.sql: |
+              CREATE USER <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user> WITH PASSWORD '<path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>';
+              CREATE DATABASE <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db> OWNER <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>;
+              GRANT ALL PRIVILEGES ON DATABASE <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db> TO <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>;
     ingress:
       enabled: true
       ingressClassName: "nginx"
@@ -595,7 +602,7 @@ company-lookup:
     port: 5080
   postgresqlHostOverride: "blueprint-leo-postgresql"
   postgresql:
-    enabled: true
+    enabled: false
     auth:
       username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
       password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
