@@ -1,0 +1,58 @@
+{
+    "realm": "<path:factory-x-ci-cd/data/gateway-sts-consumer#keycloak-realm-name>",
+    "enabled": true,
+    "clients": [
+        {
+            "clientId": "<path:factory-x-ci-cd/data/gateway-sts-consumer#keycloak-client-id>",
+            "surrogateAuthRequired": false,
+            "enabled": true,
+            "alwaysDisplayInConsole": false,
+            "clientAuthenticatorType": "client-secret",
+            "secret": "<path:factory-x-ci-cd/data/gateway-sts-consumer#keycloak-client-secret>",
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ],
+            "notBefore": 0,
+            "bearerOnly": false,
+            "consentRequired": false,
+            "standardFlowEnabled": false,
+            "implicitFlowEnabled": false,
+            "directAccessGrantsEnabled": true,
+            "serviceAccountsEnabled": true,
+            "publicClient": false,
+            "frontchannelLogout": false,
+            "protocol": "openid-connect",
+            "attributes": {
+                "realm_client": "false",
+                "post.logout.redirect.uris": "+"
+            },
+            "authenticationFlowBindingOverrides": {},
+            "fullScopeAllowed": true,
+            "nodeReRegistrationTimeout": -1,
+            "defaultClientScopes": [
+                "acr",
+                "profile",
+                "basic",
+                "email"
+            ],
+            "optionalClientScopes": [
+                "web-origins",
+                "service_account",
+                "address",
+                "phone",
+                "roles",
+                "organization",
+                "offline_access",
+                "microprofile-jwt"
+            ],
+            "access": {
+                "view": true,
+                "configure": true,
+                "manage": true
+            }
+        }
+    ]
+}

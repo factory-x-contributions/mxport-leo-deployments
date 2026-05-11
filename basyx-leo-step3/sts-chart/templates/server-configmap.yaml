@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sts-chart.fullname" . }}-server-config
+data:
+  server-config.yml: |-
+    serviceConfiguration:
+      issuer: {{ .Values.serverConfig.issuer }}
+      chooseFilterManagerBySubjectToken: {{ .Values.serverConfig.chooseFilterManagerBySubjectToken | default true }}
+      signingKeyAlias: {{ .Values.serverConfig.signingKeyAlias }}
+      tokenExchangeFilterConfigurationYml: {{ .Values.serverConfig.tokenExchangeFilterConfigurationYml }}
+    {{- with .Values.serverConfig.keystore }}
+      keystore:
+        keystoreLocation: {{ .keystoreLocation }}
+        keystorePassword: {{ .keyPassword }}
+        keyPassword: {{ .keyPassword }}
+        keyAlias: {{ .keyAlias }}
+        keystoreType: {{ .keystoreType }}
+    {{- end }}
+    {{- with .Values.serverConfig.plainkey }}
+        plainkey:
+          key-location: {{ .keyLocation }}
+    {{- end }}
+      outgoingTokenScopeClaimName: {{ .Values.serverConfig.outgoingTokenScopeClaimName | default "scope" }}
+      forceOverwriteIssuerWithConfiguredValue: {{ .Values.serverConfig.forceOverwriteIssuerWithConfiguredValue | default false }}
+      forceOverwriteIatWithNow: {{ .Values.serverConfig.forceOverwriteIatWithNow | default false }}
+      forceNewJti: {{ .Values.serverConfig.forceNewJti | default false }}
+    issuerSpecificConfiguration:
+    {{- range .Values.serverConfig.issuerSpecificConfiguration }}
+      - issuer: {{ .issuer }}
+        {{- if eq .jwks.jwksType "uri"}}
+        jwksUri: {{ .jwks.jwksUri }}
+        {{- else if eq .jwks.jwksType "value" }}
+        jwksValue: {{ .jwks.jwksValue }}
+        {{- end }}
+        connectionTimeoutInMs: {{ .connectionTimeoutInMs | default 20000 }}
+        readTimeoutInMs: {{ .readTimeoutInMs | default 20000 }}
+        tokenScopeClaimName: {{ .tokenScopeClaimName | default "scope" }}
+        propagateIssuerToValidators: {{ .propagateIssuerToValidators | default true }}
+        disableSubjectTokenClaimsSetValidator: {{ .disableSubjectTokenClaimsSetValidator | default false }}
+
+        subjectTokenClaimsSetValidator:
+        {{- $stcsv := .subjectTokenClaimsSetValidator | default dict }}
+          issuerRequired: {{ $stcsv.issuerRequired | default true }}
+
+          ######## TODO
+          #set issuer - optional (note if, this filter chains propagate-issuer-to-validators is true the issuer will be propagated from the filter chain)
+          #issuer: abc
+          # Required incoming token scopes. Can be empty.
+          # requiredScopes:
+            # - https://localhost/token.exchange
+          # Required incoming token audiences. Can be empty.
+          # requiredAudiences:
+            # - https://localhost/token
+          #########
+
+          expiryClaimRequired: {{ $stcsv.expiryClaimRequired | default true }}
+          expiryCheckDisabled: {{ $stcsv.expiryCheckDisabled | default false }}
+          nbfClaimRequired: {{ $stcsv.nbfClaimRequired | default false }}
+          nbfCheckDisabled: {{ $stcsv.nbfCheckDisabled | default false }}
+          iatClaimRequired: {{ $stcsv.iatClaimRequired | default false }}
+          iatCheckDisabled: {{ $stcsv.iatCheckDisabled | default false }}
+        actorTokenRequired: {{ .actorTokenRequired | default false }}
+    {{- end}}

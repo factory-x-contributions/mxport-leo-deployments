@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "sts-chart.fullname" . }}-trusted-list
+data:
+  signed_example_trusted_list.xml: |-
+    {{- .Files.Get "config/trusted-list/signed_example_trusted_list.xml" | nindent 4 }}
+  19612_xsd.xsd: |-
+    {{- .Files.Get "config/trusted-list/19612_xsd.xsd" | nindent 4 }}
+  rsa_public.pem: |-
+    {{- .Files.Get "config/trusted-list/rsa_public.pem" | nindent 4 }}

@@ -1,0 +1,134 @@
+nameOverride: security-token-service
+fullnameOverride: security-token-service
+
+image:
+  repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  tls: false
+  hosts:
+    - host: tokenservice
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+autoscaling:
+  enabled: false
+
+serviceAccount:
+  create: false
+
+resources: {}
+
+environment:
+  springTokenExchangeConfigLocation: server-config/server-config.yml
+  serverContextPath: /sts
+
+trustlist:
+  enabled: false
+  location: trusted-list/signed_example_trusted_list.xml
+  schema: trusted-list/19612_xsd.xsd
+  publicKey: trusted-list/rsa_public.pem
+
+volumes:
+  - name: security-token-service-server-config
+    configMap:
+      name: security-token-service-server-config
+  - name: security-token-service-filter-config
+    configMap:
+      name: security-token-service-filter-config
+  - name: security-token-service-signingkey
+    secret:
+      secretName: security-token-service-signingkey
+  - name: trusted-list
+    configMap:
+      name: security-token-service-trusted-list
+
+volumeMounts:
+  - name: security-token-service-server-config
+    mountPath: "/app/server-config"
+    readOnly: true
+  - name: security-token-service-filter-config
+    mountPath: "/app/filter-config"
+    readOnly: true
+  - name: security-token-service-signingkey
+    mountPath: "/app/signingkey"
+    readOnly: true
+  - name: trusted-list
+    mountPath: "/app/trusted-list"
+    readOnly: true
+
+# Token Exchange Service -- Server Config
+serverConfig:
+  issuer: http://tokenservice/sts
+  signingKeyAlias: demo-key
+  tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
+  keystore:
+    keystoreLocation: signingkey/keystore.jks
+    keystorePassword: changeit
+    keyPassword: changeit
+    keyAlias: demo-key
+    keystoreType: JKS
+  issuerSpecificConfiguration:
+    - issuer: http://keycloak/realms/sts-realm
+      jwks:
+        jwksType: "uri"
+        jwksUri: http://keycloak/realms/sts-realm/protocol/openid-connect/certs
+
+# Token Exchange Service -- Filter Config
+filterConfig:
+  - filterType: com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      claimsMap:
+        sub: sub
+        exp: exp
+        nbf: nbf
+        iat: iat
+  - filterType: com.siemens.iam.exchange.core.filter.OriginalClaimsPreservationFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      targetClaimValue: "incoming-token-claims"
+      claimsToPreserve:
+        - iss
+        - sub
+        - jti
+        - cid
+        - user_name
+        - "incoming-token-claims"
+  - filterType: com.siemens.iam.exchange.core.filter.IssuerPrefixFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      delimiter: "|"
+      claimsToPrefix:
+        - sub
+        - cid
+        - user_name
+  - filterType: com.siemens.iam.exchange.core.filter.ScopeMappingFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      incomingTokenScopeClaimName: scope
+      outgoingTokenScopeClaimName: scope
+      scopesMap:
+        api1.full-access: serviceA.read,serviceA.write
+        api1.read-only: serviceA.read
+  - filterType: com.siemens.iam.exchange.core.filter.SupportRequestParamScopeFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      outgoingTokenScopeClaimName: scope
+  - filterType: com.siemens.iam.exchange.core.filter.UaaStyleAudienceFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      outgoingTokenScopeClaimName: scope
+  - filterType: com.siemens.iam.exchange.sample.filter.MySampleFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      claimName: sampleClaimWithKeysFromIncomingTokenFromYaml

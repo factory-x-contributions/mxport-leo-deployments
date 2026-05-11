@@ -1,0 +1,278 @@
+#################################################################
+# Configuration of this file follows SnakeYAML
+# see: https://bitbucket.org/asomov/snakeyaml/wiki/Documentation
+#################################################################
+
+#################################################################
+# Configuration of filter chain for issuer https://auth0-style-issuer.com/
+#################################################################
+#Configuration of ClaimsCopyFilter
+!!com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+  issuer: http://basyx-keycloak/realms/test-realm
+  claimsMap:
+    sub: sub
+    exp: exp
+    nbf: nbf
+    iat: iat
+---
+#Configuration of OriginalClaimsPreservationFilter
+!!com.siemens.iam.exchange.core.filter.OriginalClaimsPreservationFilter
+  issuer: http://basyx-keycloak/realms/test-realm
+  targetClaimValue: "incoming-token-claims"      
+  claimsToPreserve:
+    - iss
+    - sub
+    - jti
+    - cid
+    - user_name
+    - "incoming-token-claims"   
+---
+#Configuration of IssuerPrefixFilter
+!!com.siemens.iam.exchange.core.filter.IssuerPrefixFilter
+  issuer: http://basyx-keycloak/realms/test-realm
+  delimiter: "|" #default value is "|"
+  claimsToPrefix:
+    - sub
+    - cid
+    - user_name
+---
+#Configuration of ScopeMappingFilter
+!!com.siemens.iam.exchange.core.filter.ScopeMappingFilter
+  issuer: http://basyx-keycloak/realms/test-realm
+  incomingTokenScopeClaimName: scope
+  outgoingTokenScopeClaimName: scope
+  scopesMap:
+    api1.full-access: serviceA.read,serviceA.write
+    api1.read-only: serviceA.read  
+---
+#Configuration of SupportRequestParamScopeFilter
+!!com.siemens.iam.exchange.core.filter.SupportRequestParamScopeFilter
+  issuer: http://basyx-keycloak/realms/test-realm
+  outgoingTokenScopeClaimName: scope
+---
+#Configuration of UaaStyleAudienceFilter
+!!com.siemens.iam.exchange.core.filter.UaaStyleAudienceFilter
+  issuer: http://basyx-keycloak/realms/test-realm
+  outgoingTokenScopeClaimName: scope  
+---
+#Configuration of MySampleFilter
+!!com.siemens.iam.exchange.sample.filter.MySampleFilter
+  issuer: http://basyx-keycloak/realms/test-realm
+  claimName: sampleClaimWithKeysFromIncomingTokenFromYaml
+# ---
+#################################################################
+# Configuration of filter chain for issuer https://scope-driven-exchange.com/
+#################################################################
+#Configuration of ClaimsCopyFilter
+# !!com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+#   issuer: https://scope-driven-exchange.com/
+#   claimsMap:
+#     sub: sub
+#     exp: exp
+#     nbf: nbf
+#     iat: iat
+# ---
+# #Configuration of OriginalClaimsPreservationFilter
+# !!com.siemens.iam.exchange.core.filter.OriginalClaimsPreservationFilter
+#   issuer: https://scope-driven-exchange.com/
+#   targetClaimValue: "incoming-token-claims"      
+#   claimsToPreserve:
+#     - iss
+#     - sub
+#     - jti
+#     - cid
+#     - user_name
+#     - "incoming-token-claims"   
+# ---
+# #Configuration of ScopeMappingFilter
+# !!com.siemens.iam.exchange.core.filter.ScopeMappingFilter
+#   issuer: https://scope-driven-exchange.com/
+#   incomingTokenScopeClaimName: scope
+#   outgoingTokenScopeClaimName: scope
+#   scopesMap:
+#     api1.full-access: serviceA.read,serviceA.write
+#     api1.read-only: serviceA.read
+# ---
+# #Configuration of MayActFilter
+# !!com.siemens.iam.exchange.core.filter.MayActFilter
+#   issuer: https://scope-driven-exchange.com/
+#   requireMayActClaimInSubjectToken: false #defaults to true
+# ---
+# #Configuration of ScopeBasedExchangeModelFilter
+# !!com.siemens.iam.exchange.core.filter.ScopeBasedExchangeModelFilter
+#   issuer: https://scope-driven-exchange.com/
+#   localIssuer: https://localhost/token
+# ---
+# #Configuration of SupportRequestParamScopeFilter
+# !!com.siemens.iam.exchange.core.filter.SupportRequestParamScopeFilter
+#   issuer: https://scope-driven-exchange.com/
+#   outgoingTokenScopeClaimName: scope
+# ---
+# #Configuration of UaaStyleAudienceFilter
+# !!com.siemens.iam.exchange.core.filter.UaaStyleAudienceFilter
+#   issuer: https://scope-driven-exchange.com/
+#   outgoingTokenScopeClaimName: scope
+# ---
+# #################################################################
+# # Configuration of filter chain for issuer https://siemens-qa-ct-002.eu.auth0.com/
+# #################################################################
+# #Configuration of ClaimsCopyFilter
+# !!com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+#   issuer: https://siemens-qa-ct-002.eu.auth0.com/
+#   claimsMap:
+#     sub: sub
+#     exp: exp
+#     nbf: nbf
+#     iat: iat
+# ---
+# #Configuration of OriginalClaimsPreservationFilter
+# !!com.siemens.iam.exchange.core.filter.OriginalClaimsPreservationFilter
+#   issuer: https://siemens-qa-ct-002.eu.auth0.com/
+#   targetClaimValue: "incoming-token-claims"      
+#   claimsToPreserve:
+#     - iss
+#     - sub
+#     - jti
+#     - cid
+#     - user_name
+#     - "incoming-token-claims"   
+# ---
+# #Configuration of IssuerPrefixFilter
+# !!com.siemens.iam.exchange.core.filter.IssuerPrefixFilter
+#   issuer: https://siemens-qa-ct-002.eu.auth0.com/
+#   delimiter: "|" #default value is "|"
+#   claimsToPrefix:
+#     - sub
+#     - cid
+#     - user_name
+# ---
+# #Configuration of ScopeMappingFilter
+# !!com.siemens.iam.exchange.core.filter.ScopeMappingFilter
+#   issuer: https://siemens-qa-ct-002.eu.auth0.com/
+#   incomingTokenScopeClaimName: scope
+#   outgoingTokenScopeClaimName: scope
+#   scopesMap:
+#     api1.read: serviceA.read,serviceB.read
+#     api1.write: serviceA.write
+# ---
+# #Configuration of SupportRequestParamScopeFilter
+# !!com.siemens.iam.exchange.core.filter.SupportRequestParamScopeFilter
+#   issuer: https://siemens-qa-ct-002.eu.auth0.com/
+#   outgoingTokenScopeClaimName: scope
+# ---  
+# #Configuration of UaaStyleAudienceFilter
+# !!com.siemens.iam.exchange.core.filter.UaaStyleAudienceFilter
+#   issuer: https://siemens-qa-ct-002.eu.auth0.com/
+#   outgoingTokenScopeClaimName: scope
+# ---
+# #Configuration of MySampleFilter
+# !!com.siemens.iam.exchange.sample.filter.MySampleFilter
+#   issuer: https://siemens-qa-ct-002.eu.auth0.com/
+#   claimName: sampleClaimWithKeysFromIncomingTokenFromYaml
+# ---
+# #################################################################
+# # Configuration of filter chain for issuer https://authorization.building360-dev.siemens.cloud/oauth/token
+# #################################################################
+# #Configuration of ClaimsCopyFilter
+# !!com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   claimsMap:
+#     sub: sub
+#     exp: exp
+#     nbf: nbf
+#     iat: iat
+#     jti: jti
+#     user_name: user_name
+#     email: email
+#     zid: zid
+#     #scope: scope
+# ---
+# #Configuration of ActorClaimsCopyFilter
+# !!com.siemens.iam.exchange.core.filter.ActorClaimsCopyFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   claimsMap:
+#     client_id: client_id
+# ---
+# #Configuration of ClaimsAppenderFilter
+# !!com.siemens.iam.exchange.core.filter.ClaimsAppenderFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   claimsMap:
+#     grant_type: token_exchange
+# ---
+# #Configuration of ScopeMappingFilter
+# #Alternative: Copy scope using the ClaimsCopyFilter
+# !!com.siemens.iam.exchange.core.filter.ScopeMappingFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   incomingTokenScopeClaimName: scope
+#   outgoingTokenScopeClaimName: scope
+#   scopesMap:
+#     rep.read: rep.read
+#     rep.write: rep.write
+#     not.read: not.read
+#     not.write: not.write
+# ---
+# #Configuration of SetExpiryFilter
+# !!com.siemens.iam.exchange.core.filter.SetExpiryFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   referenceSubjectIat: true
+#   expiry: 600
+# ---
+# #Configuration of SupportRequestParamScopeFilter
+# !!com.siemens.iam.exchange.core.filter.SupportRequestParamScopeFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   outgoingTokenScopeClaimName: scope
+# ---
+# #Configuration of ActClaimFilter
+# !!com.siemens.iam.exchange.core.filter.ActClaimFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+# --- 
+# #Configuration of MaxScopeFromClientTokenFilter
+# #Alternatively, configure max scopes per client using the MaxScopePerClientFilter
+# !!com.siemens.iam.exchange.core.filter.MaxScopeFromClientTokenFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   clientTokenScopeClaimName: scope
+#   outgoingTokenScopeClaimName: scope
+#   failIfNoScopeLeft: true
+# ---  
+# #Configuration of UaaStyleAudienceFilter
+# !!com.siemens.iam.exchange.core.filter.UaaStyleAudienceFilter
+#   issuer: https://authorization.building360-dev.siemens.cloud/oauth/token
+#   outgoingTokenScopeClaimName: scope  
+# ---
+# #################################################################
+# # Configuration of filter chain for issuer https://policy-test.com/
+# #################################################################
+# #Configuration of ClaimsCopyFilter
+# !!com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+#   issuer: https://policy-test.com/
+#   triggeringPolicies:
+#   - "*"
+#   claimsMap:
+#     sub: sub
+#     exp: exp
+#     nbf: nbf
+#     iat: iat
+#     jti: jti
+# ---
+# #Configuration of ClaimsAppenderFilter
+# !!com.siemens.iam.exchange.core.filter.ClaimsAppenderFilter
+#   issuer: https://policy-test.com/
+#   triggeringPolicies:
+#   - policyA
+#   claimsMap:
+#     triggeredby: policyA
+# ---
+# !!com.siemens.iam.exchange.core.filter.ClaimsAppenderFilter
+#   issuer: https://policy-test.com/
+#   triggeringPolicies:
+#   - policyB
+#   claimsMap:
+#     triggeredby: policyB
+
+
+
+# #################################################################
+# # Configuration of filter chain for issuer xyz
+# # can be added below (make sure issuer is properly set)
+# #################################################################
+# # Make sure to NOT put '---' after the last configuration entry to end the document.
