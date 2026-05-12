@@ -38,27 +38,27 @@ trustlist:
   publicKey: trusted-list/rsa_public.pem
 
 volumes:
-  - name: security-token-service-server-config
+  - name: {{ include "sts-chart.fullname" . }}-server-config
     configMap:
-      name: security-token-service-server-config
-  - name: security-token-service-filter-config
+      name: {{ include "sts-chart.fullname" . }}-server-config
+  - name: {{ include "sts-chart.fullname" . }}-filter-config
     configMap:
-      name: security-token-service-filter-config
-  - name: security-token-service-signingkey
+      name: {{ include "sts-chart.fullname" . }}-filter-config
+  - name: {{ include "sts-chart.fullname" . }}-signingkey
     secret:
-      secretName: security-token-service-signingkey
+      secretName: {{ include "sts-chart.fullname" . }}-signingkey
   - name: trusted-list
     configMap:
-      name: security-token-service-trusted-list
+      name: {{ include "sts-chart.fullname" . }}-trusted-list
 
 volumeMounts:
-  - name: security-token-service-server-config
+  - name: {{ include "sts-chart.fullname" . }}-server-config
     mountPath: "/app/server-config"
     readOnly: true
-  - name: security-token-service-filter-config
+  - name: {{ include "sts-chart.fullname" . }}-filter-config
     mountPath: "/app/filter-config"
     readOnly: true
-  - name: security-token-service-signingkey
+  - name: {{ include "sts-chart.fullname" . }}-signingkey
     mountPath: "/app/signingkey"
     readOnly: true
   - name: trusted-list
