@@ -1,0 +1,40 @@
+meta {
+  name: 2 - Consumer STS Token Exchange
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{sts_base}}/sts/token
+  body: formUrlEncoded
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:form-urlencoded {
+  grant_type: urn:ietf:params:oauth:grant-type:token-exchange
+  subject_token: {{access_token}}
+  subject_token_type: urn:ietf:params:oauth:token-type:jwt
+  audience: {{audience}}
+}
+
+script:post-response {
+  if (res.status === 200 && res.body && res.body.access_token) {
+    bru.setVar("sts_token", res.body.access_token);
+    console.log("✔ Received consumer STS token");
+  } else {
+    console.error("Consumer STS token exchange failed:", res.status, res.body);
+  }
+}
+
+tests {
+  test("status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("access_token is present", function() {
+    expect(res.getBody().access_token).to.be.a("string");
+  });
+}

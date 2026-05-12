@@ -1,0 +1,21 @@
+meta {
+  name: 3 - Provider Gateway Shells
+  type: http
+  seq: 3
+}
+
+head {
+  url: {{gateway_base}}/api/shells
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{sts_token}}
+}
+
+tests {
+  test("status is success", function() {
+    expect(res.getStatus()).to.be.below(400);
+  });
+}
