@@ -10,7 +10,6 @@ image:
 imagePullSecrets: []
 
 nameOverride: gateway-sts
-fullnameOverride: gateway-sts
 
 containerPort: 80
 

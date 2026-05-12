@@ -1,5 +1,4 @@
 nameOverride: security-token-service
-fullnameOverride: security-token-service
 
 image:
   repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange

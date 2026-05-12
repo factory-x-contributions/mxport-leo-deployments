@@ -324,7 +324,7 @@ sts-chart:
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    - name: ghcr-pull-secret
+    - name: basyx-leo-step3-provider-ghcr-pull-secret
 
   ingress:
     enabled: true
