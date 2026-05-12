@@ -11,7 +11,7 @@ data:
       {{- if hasKey $filter "audience" }}
       audience: {{ $filter.audience }}
       {{- end}}
-{{ toYamlPretty $filter.parameters | indent 6}}
+{{ toYaml $filter.parameters | indent 6}}
     {{- if ne (add $i 1) $filter_count}}
     ---
     {{- end}}
