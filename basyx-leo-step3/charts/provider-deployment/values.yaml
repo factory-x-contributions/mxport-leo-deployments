@@ -14,7 +14,7 @@ gateway-sts:
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
-    - name: ghcr-pull-secret
+    - name: basyx-leo-step3-provider-ghcr-pull-secret
 
   service:
     type: ClusterIP
