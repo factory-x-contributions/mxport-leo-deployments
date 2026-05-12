@@ -77,19 +77,19 @@ The collection runs the full three-step flow:
 
 1. **Keycloak Token** — `POST {keycloak_base}/realms/{realm}/protocol/openid-connect/token` with `grant_type=client_credentials` → access token
 2. **Consumer STS Token Exchange** — `POST {sts_base}/sts/token` with `grant_type=urn:ietf:params:oauth:grant-type:token-exchange`, the Keycloak token as `subject_token`, and the provider audience → FX token
-3. **Provider Gateway** — `HEAD {gateway_base}/api/shells` with the FX token as bearer → forwarded to BaSyx, expect `< 400`
+3. **Provider Endpoint** — `HEAD {provider_endpoint}/shells` with the FX token as bearer → forwarded to BaSyx, expect `< 400`
 
 Each step stashes its token into a Bruno variable, so running them top-to-bottom is enough.
 
 To run the collection against your own deployment instead, edit `bruno-basyx-leo-collection/environments/local.bru`:
 
 ```
-keycloak_base: https://<keycloak-host>
-sts_base:      https://<consumer sts-host>
-gateway_base:  https://<provider gateway-host>
-realm:         <keycloak-realm-name>
-client_id:     <keycloak-client-id>
-audience:      <provider audience>
+keycloak_base:      https://<keycloak-host>
+sts_base:           https://<consumer sts-host>
+provider_endpoint:  https://<provider gateway-host>
+realm:              <keycloak-realm-name>
+client_id:          <keycloak-client-id>
+audience:           <provider audience>
 ```
 
 Set `client_secret` in the secret vars (matches the client secret from the realm). Then run the collection in the Bruno UI or via `bru run`.
