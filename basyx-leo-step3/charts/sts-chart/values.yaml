@@ -37,33 +37,8 @@ trustlist:
   schema: trusted-list/19612_xsd.xsd
   publicKey: trusted-list/rsa_public.pem
 
-volumes:
-  - name: {{ include "sts-chart.fullname" . }}-server-config
-    configMap:
-      name: {{ include "sts-chart.fullname" . }}-server-config
-  - name: {{ include "sts-chart.fullname" . }}-filter-config
-    configMap:
-      name: {{ include "sts-chart.fullname" . }}-filter-config
-  - name: {{ include "sts-chart.fullname" . }}-signingkey
-    secret:
-      secretName: {{ include "sts-chart.fullname" . }}-signingkey
-  - name: trusted-list
-    configMap:
-      name: {{ include "sts-chart.fullname" . }}-trusted-list
-
-volumeMounts:
-  - name: {{ include "sts-chart.fullname" . }}-server-config
-    mountPath: "/app/server-config"
-    readOnly: true
-  - name: {{ include "sts-chart.fullname" . }}-filter-config
-    mountPath: "/app/filter-config"
-    readOnly: true
-  - name: {{ include "sts-chart.fullname" . }}-signingkey
-    mountPath: "/app/signingkey"
-    readOnly: true
-  - name: trusted-list
-    mountPath: "/app/trusted-list"
-    readOnly: true
+extraVolumes: []
+extraVolumeMounts: []
 
 # Token Exchange Service -- Server Config
 serverConfig:

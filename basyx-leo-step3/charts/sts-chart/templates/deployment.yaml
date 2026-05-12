@@ -73,14 +73,42 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
+            - name: server-config
+              mountPath: /app/server-config
+              readOnly: true
+            - name: filter-config
+              mountPath: /app/filter-config
+              readOnly: true
+            - name: signingkey
+              mountPath: /app/signingkey
+              readOnly: true
+            {{- if .Values.trustlist.enabled }}
+            - name: trusted-list
+              mountPath: /app/trusted-list
+              readOnly: true
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
+            {{- end }}
       volumes:
+        - name: server-config
+          configMap:
+            name: {{ include "sts-chart.fullname" . }}-server-config
+        - name: filter-config
+          configMap:
+            name: {{ include "sts-chart.fullname" . }}-filter-config
+        - name: signingkey
+          secret:
+            secretName: {{ include "sts-chart.fullname" . }}-signingkey
+        {{- if .Values.trustlist.enabled }}
+        - name: trusted-list
+          configMap:
+            name: {{ include "sts-chart.fullname" . }}-trusted-list
+        {{- end }}
+        {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
