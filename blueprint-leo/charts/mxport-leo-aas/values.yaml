@@ -106,6 +106,15 @@ mxport-leo-token-exchange-provider:
     type: ClusterIP
     port: 9050
     targetPort: 9050
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+    host: sts-provider.factory-x.catena-x.net
+    tls: true
   signingKeySecret: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-provider-private-key>
   serverConfig: |
     serviceConfiguration:
@@ -161,6 +170,15 @@ mxport-leo-token-exchange-consumer:
     type: ClusterIP
     port: 9050
     targetPort: 9050
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+    host: sts-consumer.factory-x.catena-x.net
+    tls: true
   signingKeySecret: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-consumer-private-key>
   serverConfig: |
     serviceConfiguration:
@@ -224,12 +242,7 @@ aas-basyx-v2-full:
         password: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-pw>
         database: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-db>
       primary:
-        initdb:
-          scripts:
-            create_company_lookup_db.sql: |
-              CREATE USER <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user> WITH PASSWORD '<path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>';
-              CREATE DATABASE <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db> OWNER <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>;
-              GRANT ALL PRIVILEGES ON DATABASE <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db> TO <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>;
+        initdb: {}
     ingress:
       enabled: true
       ingressClassName: "nginx"
@@ -602,6 +615,10 @@ company-lookup:
   server:
     port: 5080
   postgresqlHostOverride: "blueprint-leo-postgresql"
+  initDb:
+    enabled: true
+    adminUser: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-user>
+    adminPassword: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-pw>
   postgresql:
     enabled: false
     auth:
