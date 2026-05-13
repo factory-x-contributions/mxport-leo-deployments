@@ -32,45 +32,17 @@ spec:
       {{- end }}
       initContainers:
         - name: wait-for-postgres
-          image: "bitnamilegacy/postgresql:latest"
+          image: busybox:1.35
           command:
-            - /bin/sh
+            - sh
             - -c
             - |
-              PGHOST="{{ include "company-lookup.postgresqlHost" . }}"
-              PGPORT="5432"
-              PGUSER="{{ .Values.initDb.adminUser }}"
-              PGPASSWORD="{{ .Values.initDb.adminPassword }}"
-              CL_USER="{{ .Values.postgresql.auth.username }}"
-              CL_PASS="{{ .Values.postgresql.auth.password }}"
-              CL_DB="{{ .Values.postgresql.auth.database }}"
-
               echo "Waiting for PostgreSQL to be ready..."
-              until pg_isready -h "$PGHOST" -p "$PGPORT" -U "$PGUSER"; do
+              until nc -z {{ include "company-lookup.postgresqlHost" . }} 5432; do
                 echo "PostgreSQL not ready, waiting..."
                 sleep 5
               done
-              echo "PostgreSQL is ready."
-
-              USER_EXISTS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname = '$CL_USER'")
-              if [ "$USER_EXISTS" != "1" ]; then
-                echo "Creating user $CL_USER..."
-                psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d postgres -c "CREATE USER \"$CL_USER\" WITH PASSWORD '$CL_PASS';"
-              else
-                echo "User $CL_USER already exists, skipping."
-              fi
-
-              DB_EXISTS=$(psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$CL_DB'")
-              if [ "$DB_EXISTS" != "1" ]; then
-                echo "Creating database $CL_DB..."
-                psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d postgres -c "CREATE DATABASE \"$CL_DB\" OWNER \"$CL_USER\";"
-              else
-                echo "Database $CL_DB already exists, skipping."
-              fi
-
-              psql -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE \"$CL_DB\" TO \"$CL_USER\";"
-
-              echo "Database initialization complete."
+              echo "PostgreSQL is ready!"
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
