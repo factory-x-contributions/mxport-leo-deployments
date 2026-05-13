@@ -29,7 +29,9 @@ postgresql:
   primary:
     service:
       ports:
-        postgresql: 5432
+        postgresql: 5433
+    containerPorts:
+      postgresql: 5433
 
 seedData:
   enabled: true

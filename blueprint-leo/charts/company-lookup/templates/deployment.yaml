@@ -38,7 +38,7 @@ spec:
             - -c
             - |
               echo "Waiting for PostgreSQL to be ready..."
-              until nc -z {{ include "company-lookup.postgresqlHost" . }} 5432; do
+              until nc -z {{ include "company-lookup.postgresqlHost" . }} {{ .Values.postgresql.primary.service.ports.postgresql }}; do
                 echo "PostgreSQL not ready, waiting..."
                 sleep 5
               done
@@ -65,7 +65,7 @@ spec:
             - name: POSTGRES_HOST
               value: {{ include "company-lookup.postgresqlHost" . | quote }}
             - name: POSTGRES_PORT
-              value: "5432"
+              value: {{ .Values.postgresql.primary.service.ports.postgresql | quote }}
             - name: POSTGRES_USER
               value: {{ .Values.postgresql.auth.username | quote }}
             - name: POSTGRES_PASSWORD

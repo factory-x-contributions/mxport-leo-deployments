@@ -242,13 +242,6 @@ aas-basyx-v2-full:
         password: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-pw>
         database: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-db>
       primary:
-        extraEnvVars:
-          - name: POSTGRES_MULTIPLE_DATABASES
-            value: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db>
-          - name: POSTGRES_MULTIPLE_DATABASES_USER
-            value: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
-          - name: POSTGRES_MULTIPLE_DATABASES_PASSWORD
-            value: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
         initdb: {}
     ingress:
       enabled: true
@@ -621,13 +614,18 @@ company-lookup:
     pullPolicy: Always
   server:
     port: 5080
-  postgresqlHostOverride: "blueprint-leo-postgresql"
   postgresql:
-    enabled: false
+    enabled: true
     auth:
       username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
       password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
       database: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db>
+    primary:
+      service:
+        ports:
+          postgresql: 5433
+      containerPorts:
+        postgresql: 5433
   ingress:
     enabled: true
     host: company-lookup.factory-x.catena-x.net
