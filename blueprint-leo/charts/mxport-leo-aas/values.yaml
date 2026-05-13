@@ -583,6 +583,7 @@ mongodb:
 
   persistence:
     size: 8Gi
+    storageClassName: default
   service:
     nameOverride: fx-leo-mongodb
 
