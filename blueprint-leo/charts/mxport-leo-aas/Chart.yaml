@@ -30,6 +30,11 @@ dependencies:
     version: 0.1.0
     repository: "file://../company-lookup"
     condition: company-lookup.enabled
+  - name: postgresql
+    version: 16.x.x
+    repository: "https://charts.bitnami.com/bitnami"
+    alias: company-lookup-postgresql
+    condition: company-lookup-postgresql.enabled
   - name: rabbitmq
     version: 0.7.10
     repository: "oci://registry-1.docker.io/cloudpirates"
