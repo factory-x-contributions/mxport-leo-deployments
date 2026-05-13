@@ -35,17 +35,25 @@ data:
 
     echo "Pre-filling Company Lookup with sample data..."
 
-    echo "Adding Fraunhofer IESE..."
-    curl -s -f -X POST "${COMPANY_LOOKUP_URL}/companies" \
-      -H "Content-Type: application/json" \
-      -d @/data/fraunhofer-iese.json
-    echo ""
+    post_company() {
+        label=$1
+        file=$2
+        echo "Adding ${label}..."
+        body=$(mktemp)
+        status=$(curl -sS -o "${body}" -w "%{http_code}" -X POST "${COMPANY_LOOKUP_URL}/companies" \
+            -H "Content-Type: application/json" \
+            --data-binary @"${file}")
+        echo "  HTTP ${status}"
+        echo "  response: $(cat "${body}")"
+        rm -f "${body}"
+        if [ "${status}" -ge 400 ]; then
+            echo "Error: POST ${label} failed with HTTP ${status}"
+            return 1
+        fi
+    }
 
-    echo "Adding Example Company..."
-    curl -s -f -X POST "${COMPANY_LOOKUP_URL}/companies" \
-      -H "Content-Type: application/json" \
-      -d @/data/example-company.json
-    echo ""
+    post_company "Fraunhofer IESE" /data/fraunhofer-iese.json
+    post_company "Example Company" /data/example-company.json
 
     echo "All sample data has been successfully added to Company Lookup!"
 ---
