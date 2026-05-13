@@ -237,6 +237,7 @@ aas-basyx-v2-full:
       enabled: true
       image:
         repository: "bitnamilegacy/postgresql"
+        tag: "17.4.0-debian-12-r19"
       auth:
         username: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-user>
         password: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-pw>
@@ -633,6 +634,7 @@ company-lookup-postgresql:
   fullnameOverride: "company-lookup-postgresql"
   image:
     repository: bitnamilegacy/postgresql
+    tag: "17.6.0-debian-12-r4"
   auth:
     username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
     password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
