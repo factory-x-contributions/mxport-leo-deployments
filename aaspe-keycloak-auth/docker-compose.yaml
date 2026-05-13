@@ -1,0 +1,79 @@
+version: "3.9"
+
+# Blueprint deployment: AASPE + Keycloak
+#
+# Auth flow:
+#   1. AASX Package Explorer authenticates user against Keycloak (blueprint realm)
+#   2. Access token is exchanged at Keycloak token endpoint for an FX consumer token
+#   3. FX consumer token is presented to AASX Server for REST/HTTPS access
+#
+# Prerequisite: run scripts/init.sh once to clone and build the AASX Server source.
+#
+# Start:  docker compose up -d
+# Stop:   docker compose down
+
+services:
+
+  # ── Keycloak identity provider (embedded H2, dev mode) ────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KC_VERSION:-24.0}
+    container_name: blueprint-keycloak
+    # start-dev: embedded H2 database, no TLS required — suitable for local blueprint
+    command: start-dev --import-realm --features=token-exchange
+    restart: unless-stopped
+    environment:
+      KEYCLOAK_ADMIN: ${KC_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-admin}
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "${KC_PORT:-8080}:8080"
+    volumes:
+      - ./keycloak/realm:/opt/keycloak/data/import:ro
+    networks:
+      - blueprint-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ── AASX Server (provider + package manager web UI) ───────────────────────
+  #
+  # WITHPOLICY=FALSE  → open access, no JWT enforcement (default for blueprint demo)
+  # WITHPOLICY=TRUE   → enforces accessrules.txt; requires JWT validation config:
+  #   mount an appsettings.override.json with:
+  #   "JwtBearerOptions": { "Authority": "http://keycloak:8080/realms/blueprint" }
+  aasx-server:
+    container_name: blueprint-aasx-server
+    hostname: aasx-server
+    build:
+      context: ./aaspe/aasx-server
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      - Kestrel__Endpoints__Http__Url=http://*:${AASX_PORT:-5001}
+      - WITHPOLICY=${AASX_WITHPOLICY:-FALSE}
+      - AASX_MQTT=0
+    ports:
+      - "${AASX_PORT:-5001}:${AASX_PORT:-5001}"
+    volumes:
+      - ./aaspe/volumes/aasx:/usr/share/aasxs
+      - ./aaspe/volumes/accessrules.txt:/AasxServerBlazor/accessrules.txt
+    command: >
+      --with-db
+      --start-index 0
+      --save-temp 5
+      --edit
+      --data-path /usr/share/aasxs
+      --external-blazor http://localhost:${AASX_PORT:-5001}
+    networks:
+      - blueprint-net
+
+networks:
+  blueprint-net:
+    name: blueprint-net

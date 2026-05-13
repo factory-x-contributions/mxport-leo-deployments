@@ -1,0 +1,149 @@
+{
+  "AllAccessPermissionRules": {
+    "rules": [
+      {
+        "ACL": {
+          "ATTRIBUTES": [
+            {
+              "CLAIM": "isSuperDuperUser"
+            }
+          ],
+          "RIGHTS": [
+            "READ", "CREATE", "UPDATE", "DELETE"
+          ],
+          "ACCESS": "ALLOW"
+        },
+        "OBJECTS": [
+          {
+            "ROUTE": "*"
+          }
+        ],
+        "FORMULA": {
+          "$boolean": true
+        }
+      },
+      {
+        "ACL": {
+          "ATTRIBUTES": [
+            {
+              "CLAIM": "isNotAuthenticated"
+            }
+          ],
+          "RIGHTS": [
+            "READ", "CREATE"
+          ],
+          "ACCESS": "ALLOW"
+        },
+        "OBJECTS": [
+          {
+            "ROUTE": "/shells"
+          },
+          {
+            "ROUTE": "/submodels"
+          },
+          {
+            "ROUTE": "/packages"
+          },
+          {
+            "ROUTE": "/query"
+          }
+        ],
+        "FORMULA": {
+          "$or": [
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "Nameplate"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "ProductChangeNotifications"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "CarbonFootprint"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "HandoverDocumentation"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "CarbonFootprint"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "BOM_Article"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "CarbonFootprint"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "TechnicalData"
+                }
+              ]
+            },
+            {
+              "$eq": [
+                {
+                  "$field": "$sm#idShort"
+                },
+                {
+                  "$strVal": "DB"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+

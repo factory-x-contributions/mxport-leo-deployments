@@ -1,0 +1,136 @@
+{
+  "realm": "blueprint",
+  "displayName": "MX-Port Leo Blueprint",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "accessTokenLifespan": 300,
+  "accessTokenLifespanForImplicitFlow": 900,
+
+  "roles": {
+    "realm": [
+      {
+        "name": "aasx-superuser",
+        "description": "Full read/write access to AASX Server"
+      },
+      {
+        "name": "aasx-consumer",
+        "description": "Read access to AASX Server"
+      }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "aasx-package-explorer",
+      "name": "AASX Package Explorer",
+      "description": "Desktop client — authenticates the user and initiates token exchange",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5001/*",
+        "urn:ietf:wg:oauth:2.0:oob",
+        "*"
+      ],
+      "webOrigins": ["*"],
+      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "email", "aas-claims"],
+      "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
+    },
+    {
+      "clientId": "aasx-consumer",
+      "name": "AASX Consumer",
+      "description": "Confidential client used for STS token exchange — issues FX consumer tokens",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "aasx-consumer-secret",
+      "directAccessGrantsEnabled": false,
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "email", "aas-claims"],
+      "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
+    },
+    {
+      "clientId": "aasx-server",
+      "name": "AASX Server",
+      "description": "Resource server — validates bearer tokens for REST API access",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "aasx-server-secret",
+      "bearerOnly": true,
+      "directAccessGrantsEnabled": false,
+      "standardFlowEnabled": false,
+      "serviceAccountsEnabled": false
+    }
+  ],
+
+  "clientScopes": [
+    {
+      "name": "aas-claims",
+      "description": "Custom claims required by AASX Server accessrules.txt",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "isSuperDuperUser",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "isSuperDuperUser",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "isSuperDuperUser",
+            "jsonType.label": "boolean",
+            "aggregate.attrs": "false",
+            "multivalued": "false"
+          }
+        }
+      ]
+    }
+  ],
+
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@blueprint.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["aasx-superuser"],
+      "attributes": {
+        "isSuperDuperUser": ["true"]
+      }
+    },
+    {
+      "username": "consumer",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Consumer",
+      "lastName": "User",
+      "email": "consumer@blueprint.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "consumer",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["aasx-consumer"]
+    }
+  ]
+}

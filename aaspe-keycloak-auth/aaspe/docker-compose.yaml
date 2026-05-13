@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  aasx-server:
+    container_name: aasx-server
+    hostname: aasx-server
+    build: aasx-server
+    restart: unless-stopped
+    environment:
+      - Kestrel__Endpoints__Http__Url=http://*:5001
+      - WITHPOLICY=FALSE
+      - AASX_MQTT=1
+    volumes:
+      - ./volumes/trustlist.txt:/AasxServerBlazor/trustlist.txt
+      - ./volumes/aasx:/usr/share/aasxs
+      - ./volumes/accessrules.txt:/AasxServerBlazor/accessrules.txt
+    networks:
+      - main
+    # db without import
+    # command: --with-db --start-index 1000 --save-temp 5 --edit --data-path /usr/share/aasxs --external-blazor https://aasx-server.dev.pxcio.net 
+    # db with import
+    command: --with-db --start-index 0 --save-temp 5 --edit --data-path /usr/share/aasxs --external-blazor https://aasx-server.dev.pxcio.net 
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.limit.buffering.maxRequestBodyBytes=10737418240"
+      - "traefik.http.middlewares.limit.buffering.memRequestBodyBytes=200000000"
+      - "traefik.http.middlewares.limit.buffering.maxResponseBodyBytes=10737418240"
+      - "traefik.http.middlewares.limit.buffering.memResponseBodyBytes=200000000"
+      - "traefik.http.routers.aasx-server.middlewares=limit@docker"
+      - "traefik.http.routers.aasx-server.rule=Host(`aasx-server.dev.pxcio.net`)"
+      - "traefik.http.routers.aasx-server.entrypoints=websecure"
+      - "traefik.http.routers.aasx-server.tls.certresolver=production"
+      - "traefik.http.routers.aasx-server.service=aasx-server"
+      - "traefik.http.services.aasx-server.loadbalancer.server.port=5001"
+
+networks:
+  main:
+    external: true
