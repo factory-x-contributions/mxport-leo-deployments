@@ -31,11 +31,6 @@ postgresql:
       ports:
         postgresql: 5432
 
-initDb:
-  enabled: true
-  adminUser: admin
-  adminPassword: admin123
-
 seedData:
   enabled: true
 

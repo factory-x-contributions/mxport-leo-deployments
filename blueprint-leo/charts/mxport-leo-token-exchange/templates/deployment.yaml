@@ -29,22 +29,6 @@ spec:
         - name: {{ $key }}
           value: {{ $value | quote }}
         {{- end }}
-        livenessProbe:
-          httpGet:
-            path: /sts/actuator/health
-            port: http
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 5
-        readinessProbe:
-          httpGet:
-            path: /sts/actuator/health
-            port: http
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 5
         volumeMounts:
         - name: server-config
           mountPath: /app/server-config
