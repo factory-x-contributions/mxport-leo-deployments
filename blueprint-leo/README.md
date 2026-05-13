@@ -51,3 +51,5 @@ The services have the following startup order dependencies:
 2. Keycloak (authentication)
 3. BaSyx services (AAS registry, discovery, environment)
 4. FA3ST Service + Registry
+5. Consumer + Provider Token Exchange
+6. Company Lookup
