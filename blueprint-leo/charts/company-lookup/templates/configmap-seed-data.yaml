@@ -13,17 +13,17 @@ data:
     COMPANY_LOOKUP_URL="http://{{ include "company-lookup.fullname" . }}:{{ .Values.service.port }}"
 
     echo "Waiting for Company Lookup to be ready..."
-    max_attempts=30
+    max_attempts=60
     attempt=0
 
     while [ $attempt -lt $max_attempts ]; do
-        if wget -q -O /dev/null "${COMPANY_LOOKUP_URL}/health" 2>/dev/null; then
+        if curl -fsS -o /dev/null "${COMPANY_LOOKUP_URL}/health"; then
             echo "Company Lookup is healthy!"
             break
         fi
         attempt=$((attempt + 1))
         echo "Attempt ${attempt}/${max_attempts} - Service not ready yet, waiting..."
-        sleep 2
+        sleep 5
     done
 
     if [ $attempt -eq $max_attempts ]; then

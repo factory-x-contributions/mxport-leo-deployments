@@ -14,7 +14,9 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "company-lookup.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/name: {{ include "company-lookup.name" . }}-seed
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: seed
     spec:
       restartPolicy: Never
       containers:
