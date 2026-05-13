@@ -614,8 +614,9 @@ company-lookup:
     pullPolicy: Always
   server:
     port: 5080
+  postgresqlHostOverride: "company-lookup-postgresql"
   postgresql:
-    enabled: true
+    enabled: false
     auth:
       username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
       password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
@@ -626,6 +627,22 @@ company-lookup:
           postgresql: 5433
       containerPorts:
         postgresql: 5433
+
+company-lookup-postgresql:
+  enabled: true
+  fullnameOverride: "company-lookup-postgresql"
+  image:
+    repository: bitnamilegacy/postgresql
+  auth:
+    username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
+    password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
+    database: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db>
+  primary:
+    service:
+      ports:
+        postgresql: 5433
+    containerPorts:
+      postgresql: 5433
   ingress:
     enabled: true
     host: company-lookup.factory-x.catena-x.net
