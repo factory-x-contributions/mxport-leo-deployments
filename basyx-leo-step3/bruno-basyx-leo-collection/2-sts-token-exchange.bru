@@ -23,7 +23,7 @@ body:form-urlencoded {
 
 script:post-response {
   if (res.status === 200 && res.body && res.body.access_token) {
-    bru.setVar("sts_token", res.body.access_token);
+    bru.setVar("fx_token", res.body.access_token);
     console.log("✔ Received consumer STS token");
   } else {
     console.error("Consumer STS token exchange failed:", res.status, res.body);

@@ -2,15 +2,15 @@
   	
   <SchemeInformation>
     		
-    <TSLVersionIdentifier>5</TSLVersionIdentifier>
+    <TSLVersionIdentifier>4</TSLVersionIdentifier>
     		
-    <TSLSequenceNumber>148</TSLSequenceNumber>
+    <TSLSequenceNumber>149</TSLSequenceNumber>
     		
     <TSLType>http://MxLeo/TrstSvc/TrustedList/TSLType/EUgeneric</TSLType>
     		
     <SchemeOperatorName>
       			
-      <Name xml:lang="en">FX Operating Company</Name>
+      <Name xml:lang="en">Operating Company for MX-Port Leo</Name>
       		
     </SchemeOperatorName>
     		
@@ -44,7 +44,7 @@
     		
     <SchemeName>
       			
-      <Name xml:lang="en">Trusted list for MX Port Leo including information related to the trust service providers and trust services</Name>
+      <Name xml:lang="en">Trusted list for MX-Port Leo</Name>
       		
     </SchemeName>
     		
@@ -54,7 +54,7 @@
       		
     </SchemeInformationURI>
     		
-    <StatusDeterminationApproach>http://MxLeo/TrstSvc/TrustedList/StatusDetn/EUcommon</StatusDeterminationApproach>
+    <StatusDeterminationApproach>http://uri.etsi.org/TrstSvc/TrustedList/StatusDetn/EUappropriate</StatusDeterminationApproach>
     		
     <SchemeTypeCommunityRules>
       			
@@ -96,13 +96,13 @@
         				
         <TSPName>
           					
-          <Name xml:lang="de">Factory-X TP Demo</Name>
+          <Name xml:lang="de">Siemens</Name>
           				
         </TSPName>
         				
         <TSPTradeName>
           					
-          <Name xml:lang="en">VAT-xyz</Name>
+          <Name xml:lang="en">Siemens AG</Name>
           				
         </TSPTradeName>
         				
@@ -112,13 +112,13 @@
             						
             <PostalAddress xml:lang="en">
               							
-              <StreetAddress>Factory-X Str 1</StreetAddress>
+              <StreetAddress>Werner-von-Siemens-Straße 1</StreetAddress>
               							
-              <Locality>Frankfurt</Locality>
+              <Locality>Munich</Locality>
               							
-              <PostalCode>60549</PostalCode>
+              <PostalCode>80333</PostalCode>
               							
-              <CountryName>DE</CountryName>
+              <CountryName>Germany</CountryName>
               						
             </PostalAddress>
             					
@@ -126,7 +126,7 @@
           					
           <ElectronicAddress>
             						
-            <URI xml:lang="en">https://www.demo.factory-x.org</URI>
+            <URI xml:lang="en">https://www.siemens.com</URI>
             					
           </ElectronicAddress>
           				
@@ -134,7 +134,7 @@
         				
         <TSPInformationURI>
           					
-          <URI xml:lang="en">https://www.demo.factory-x.org/info</URI>
+          <URI xml:lang="en">https://www.siemens.com/global/en/general/legal.html</URI>
           				
         </TSPInformationURI>
         				
@@ -160,7 +160,7 @@
             						
             <ServiceName>
               							
-              <Name xml:lang="en">Factory-X Central STS</Name>
+              <Name xml:lang="en">Factory-X Central Consumer STS</Name>
               						
             </ServiceName>
             						
@@ -170,7 +170,7 @@
                 							
                 <Other>
                   							  
-                  <URI>https://iam-security-training.com/sts</URI>
+                  <URI>https://iam-security-training.com/consumer/sts</URI>
                   							
                 </Other>
                 						  
@@ -184,7 +184,47 @@
             						
             <ServiceSupplyPoints>
               						    
-              <ServiceSupplyPoint>https://iam-security-training.com/sts</ServiceSupplyPoint>
+              <ServiceSupplyPoint>https://iam-security-training.com/consumer/sts</ServiceSupplyPoint>
+              						
+            </ServiceSupplyPoints>
+            					
+          </ServiceInformation>
+          				
+        </TSPService>
+        				
+        <TSPService>
+          					
+          <ServiceInformation>
+            						
+            <ServiceTypeIdentifier>http://uri.etsi.org/TrstSvc/Svctype/RA/nothavingPKIid</ServiceTypeIdentifier>
+            						
+            <ServiceName>
+              							
+              <Name xml:lang="en">Factory-X Central Provider STS</Name>
+              						
+            </ServiceName>
+            						
+            <ServiceDigitalIdentity>
+              						  
+              <DigitalId>
+                							
+                <Other>
+                  							  
+                  <URI>https://iam-security-training.com/provider/sts</URI>
+                  							
+                </Other>
+                						  
+              </DigitalId>
+              						
+            </ServiceDigitalIdentity>
+            						
+            <ServiceStatus>http://uri.etsi.org/TrstSvc/TrustedList/Svcstatus/granted</ServiceStatus>
+            						
+            <StatusStartingTime>2025-09-16T12:30:00Z</StatusStartingTime>
+            						
+            <ServiceSupplyPoints>
+              						    
+              <ServiceSupplyPoint>https://iam-security-training.com/provider/sts</ServiceSupplyPoint>
               						
             </ServiceSupplyPoints>
             					
@@ -266,7 +306,7 @@
             						
             <ServiceName>
               							
-              <Name xml:lang="en">Factory-X Central STS</Name>
+              <Name xml:lang="en">Factory-X Demo Consumer STS</Name>
               						
             </ServiceName>
             						
@@ -297,6 +337,46 @@
           </ServiceInformation>
           				
         </TSPService>
+        				
+        <TSPService>
+          					
+          <ServiceInformation>
+            						
+            <ServiceTypeIdentifier>http://uri.etsi.org/TrstSvc/Svctype/RA/nothavingPKIid</ServiceTypeIdentifier>
+            						
+            <ServiceName>
+              							
+              <Name xml:lang="en">Factory-X Demo Consumer STS</Name>
+              						
+            </ServiceName>
+            						
+            <ServiceDigitalIdentity>
+              						  
+              <DigitalId>
+                							
+                <Other>
+                  							  
+                  <URI>https://sts.consumer.basyx-leo.factory-x.catena-x.net/sts</URI>
+                  							
+                </Other>
+                						  
+              </DigitalId>
+              						
+            </ServiceDigitalIdentity>
+            						
+            <ServiceStatus>http://uri.etsi.org/TrstSvc/TrustedList/Svcstatus/granted</ServiceStatus>
+            						
+            <StatusStartingTime>2025-09-16T12:30:00Z</StatusStartingTime>
+            						
+            <ServiceSupplyPoints>
+              						    
+              <ServiceSupplyPoint>https://sts.consumer.basyx-leo.factory-x.catena-x.net/sts</ServiceSupplyPoint>
+              						
+            </ServiceSupplyPoints>
+            					
+          </ServiceInformation>
+          				
+        </TSPService>
         			
       </TSPServices>
       		
@@ -304,15 +384,15 @@
     	
   </TrustServiceProviderList>
   
-<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>N7p7kGvrZ6nDxi9VjrHy91gc0+8PiBT6wXm/qYxqxCw=</DigestValue></Reference></SignedInfo><SignatureValue>BF4rFec81iltZBAat0JKVPU05k0awpbxnprwzxv0Q3tKOUexNCdlZUHcTLbakgLr8jiEaAoOTI7+&#13;
-2FydiuGa2S/SUAT/geQhEkUdKS1pltZZJKLtCWOV/q/xhrCFPsjE/g2pwvO8KbI2k1SjYKVIalVk&#13;
-9y/x7A4+wDncwMEXrRauzZjftbZYKxl96+rm0CiFMnLKJu/uOzlKqIez90VRdje0BQgqbT3jWxfQ&#13;
-AfHl6QQKwFYJsVfwBK5qnXA9zaO32D9SHhnG32bSHB9y+oQ20A9kzm79QuYBqJ4DDElEfpbinZTL&#13;
-zCEgjZi14qOqyGuzbh2jvyrg2LlMXXWFjvE/2vXJNB56EUxS6ZODqcznJxnCFaime5Hs/Tg9pM9E&#13;
-HkV1o0eTSM7Q5xX8h5sIBpPmBtabOxQ23WfCpbUu/Z0aFnd2vMZ9w8/aIy/2+KSPh1TZq2UOy/i7&#13;
-FhVJpcivS2Ja7o/inoWh7XFtgQe+XyYkyQpRuBxYTdjK53zyVOr0SvPByStF1z5EOj80OJQDUqZX&#13;
-EVXFlUAabQM4MGfvq0rcU0Wyc+IXrf4n1pGf+xNxZVWU5K7OyuI7DWD4N2HiTX+VvJljZ276mRk+&#13;
-DH5k/iZaDU9I6keVv032tMyuPQMG3DmNCfNxNs+exzO51jQqrhNX2cJp+FQbTYGHtDVo0Y9Ouuw=</SignatureValue><KeyInfo><X509Data><X509Certificate>MIIE9DCCAtygAwIBAgIUYbKwz2LZTMiHv94CS6GV2Uahi1gwDQYJKoZIhvcNAQELBQAwETEPMA0G&#13;
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>y7zeyme7ZRcWQ+LrO6l9o/QyuA0L3XOMIEPHeI5VfPs=</DigestValue></Reference></SignedInfo><SignatureValue>aIUd8Yjz3LAlJ2bWiHUagl5RMK7O/rseaVrWh7whZKM8cuTN2L1XjUeLtGuJhNawDoSV5p4gQ36U&#13;
+nVxFC814alOqVgO23LD9v6541BdMCgqqpryb5qVrZhjSC9NEm6sy//2vAotcJj2IDB+a0N/HJKRz&#13;
+PH8Qshi98NsDbG+Wj65IEJX1tLszhPLPgTto3EEKz+OP/FqmbU75nK9NY50wom+m/DS0lA7rwQnp&#13;
+KS0c9wBy+vwzpO5INNs5Ax/AuB+14EZUw/46JRMQxW1bFmxA/wb1DzCXNm4knlNs7AM7y2ChZaeL&#13;
+EFo7MLfwaytaemQWc+jxQvj6atOOWs1NRoqTaOe+X6mSx4OmjSyqXKzb35k9MKqzs5KxWHrA0qiA&#13;
+lZ7ZJHuaRQMBALLWO2YcQEK32DPnUau72Py4kK7E3IlmanDZtPRdc46Xt/L6iWZzBWe2IsDqCIGj&#13;
+FEy95V60HAfZnNo+vIFeRf90G9G0fKN4PmkOqPkHhezSKmrg2sYv19ee6JIo3T9WxWB7O2K1WSrD&#13;
+1QvAF4TUeEVha+WLBhy9tVAk/6aeW/67FjgvZOlKvbTm+ZmgtkhcOuQ4x4Kbb85/FX+AQtoyKNEN&#13;
+LrMzY0KSDtfTrxkt3MXEn3oor6pRg+JaGXt3L8f8m53C99gmbEaKAWHuGoRkXu5fdcKKzRi4ybo=</SignatureValue><KeyInfo><X509Data><X509Certificate>MIIE9DCCAtygAwIBAgIUYbKwz2LZTMiHv94CS6GV2Uahi1gwDQYJKoZIhvcNAQELBQAwETEPMA0G&#13;
 A1UEAwwGUm9vdENBMB4XDTI1MTIwMzEzMTQ0MVoXDTI2MTIwMzEzMTQ0MVowEzERMA8GA1UEAwwI&#13;
 UlNBIENlcnQwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDSNi56Ky7Jxq2VYHQC2+e3&#13;
 9/BAz67lWdlLa41WwLUqKP9Lztl0JIf9WqhBRVWG9v71eoydqhNMxWv62NpRy7DEKXdhz7ey8ot7&#13;

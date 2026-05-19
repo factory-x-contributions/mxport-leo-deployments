@@ -343,7 +343,7 @@ sts-chart:
             pathType: ImplementationSpecific
 
   trustlist:
-    enabled: false
+    enabled: true
 
   serverConfig:
     issuer: "https://<path:factory-x-ci-cd/data/gateway-sts-provider#sts-host>/sts"

@@ -96,3 +96,4 @@ sts-chart:
         iat: iat
         exp: exp
         sub: sub
+        client_id: client_id
