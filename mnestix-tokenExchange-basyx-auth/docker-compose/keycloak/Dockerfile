@@ -1,4 +1,6 @@
-﻿# syntax=docker/dockerfile:1
+﻿# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
+# syntax=docker/dockerfile:1
 FROM --platform=linux/amd64 maven:3-eclipse-temurin-17-alpine as build
 WORKDIR /workspace
 COPY ./initializer/pom.xml /workspace/pom.xml

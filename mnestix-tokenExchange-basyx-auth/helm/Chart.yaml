@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
 apiVersion: v2
 name: mnestix-tokenexchange-basyx-auth
 description: Helm chart to deploy Mnestix Browser, Mnestix Proxy, Keycloak, MongoDB, and BaSyx AAS Environment

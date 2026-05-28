@@ -1,3 +1,5 @@
+{{/* SPDX-License-Identifier: MIT */}}
+{{/* Copyright (c) 2025 XITASO GmbH */}}
 {{- define "mnestix-tokenexchange-basyx-auth.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

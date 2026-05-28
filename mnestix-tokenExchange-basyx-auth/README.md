@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Copyright (c) 2025 XITASO GmbH -->
 # Mnestix Token Exchange - Deployment Setup
 
 This repository is split into two independent setup folders:

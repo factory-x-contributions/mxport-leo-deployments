@@ -1,3 +1,5 @@
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Copyright (c) 2025 XITASO GmbH -->
 # Helm Deployment
 
 This folder contains the Helm chart for deploying the complete stack:

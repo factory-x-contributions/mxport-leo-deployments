@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
 {{- if and .Values.mnestixBrowser.enabled .Values.mnestixBrowser.persistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim

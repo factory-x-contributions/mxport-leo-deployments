@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
 {{- if .Values.mnestixBrowser.enabled }}
 {{ $browserName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-browser") }}
 {{ $proxyName := include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-proxy") }}

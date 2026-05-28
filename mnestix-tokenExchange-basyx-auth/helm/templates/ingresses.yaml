@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
 {{- if and .Values.mnestixBrowser.enabled .Values.mnestixBrowser.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
