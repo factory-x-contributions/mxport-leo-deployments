@@ -15,17 +15,37 @@ The proxy sits between the client and the AAS repository. Testing was performed 
 
 ![](./wiki/FX-Specifics/FX-Mnestix-Proxy.png)
 
-### Steps needed to demonstrate the functionality of the proxy locally  ###
-- Run local instance of Mnestix Browser and Mnestix Proxy and Keycloak. Keycloak provides the token to be exchanged via STS (security token service) 
-    - in terminal ```docker compose up -d```
-- After starting up the proxy, you can test it via your browser: 
+### Quick Start ###
+
+Start the entire stack with a single command:
+
+```bash
+docker compose up -d
+```
+
+This will build and start all services. The first start may take a few minutes due to the Keycloak image build (Maven compilation).
+
+### Available Services ###
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| Mnestix Browser | http://localhost:3000 | AAS web UI |
+| Mnestix Proxy | http://localhost:5065 | Reverse proxy with token exchange |
+| Keycloak | http://localhost:8080 | Identity provider (Admin: `admin` / `admin`) |
+| Keycloak (HTTPS) | https://localhost:8443 | Keycloak HTTPS endpoint |
+| MongoDB | (internal only) | Database backend for BaSyx |
+| BaSyx AAS Environment | (internal only) | AAS repository |
+
+### Demo Walkthrough ###
+
+- After starting up the proxy, you can test it via your browser:
   - get all shells from [plugfest5](https://plugfest5.aas-voyager.com/api/v3.0/) by calling: http://localhost:5065/plugfest5/shells
   - get all submodels from [plugfest5](https://plugfest5.aas-voyager.com/api/v3.0/) by calling: http://localhost:5065/plugfest5/submodels
-  - HINT: try calling https://plugfest5.aas-voyager.com/api/v3.0/submodels directly and you will not get e.g. the HandoverDocumentation submodels because of missing credentials.  
-- Open your browser and navigate to your local Mnestix Browser via http://localhost:3000 
+  - HINT: try calling https://plugfest5.aas-voyager.com/api/v3.0/submodels directly and you will not get e.g. the HandoverDocumentation submodels because of missing credentials.
+- Open your browser and navigate to http://localhost:3000
     - Click "GO TO AAS LIST".
     - If you do not have a Authorization header in the request, the proxy will return HTTP Status "401 - not authenticated" (This is for demo and testing purposes.)
-      - You  get an hint in the Mnestix Browser: "Authentication needed"
+      - You get a hint in the Mnestix Browser: "Authentication needed"
       - click "Login" to get forwarded to Keycloak (running at http://localhost:8080)
       - Authenticate in keycloak with these credentials (this user is allowed to see all submodels of plugfest5)
         - Username: aorzelski@phoenixcontact.com
@@ -33,6 +53,12 @@ The proxy sits between the client and the AAS repository. Testing was performed 
       - You get your token in the Authorization header
       - You will get a nice visualization of all the AASs from plugfest5 via the Mnestix-Proxy.
     - You can click an AAS and see all the details including all submodels.
+
+### Stop ###
+
+```bash
+docker compose down
+```
 
 ### For Developers ###
 The implementation for Factory-X is mainly done in the file: [FXTransformProvider.cs](mnestix-proxy/Authentication/TokenExchange/FXTransformProvider.cs)
