@@ -1,0 +1,51 @@
+{
+    "realm": "fa3st-provider",
+    "enabled": true,
+    "clients": [
+        {
+            "clientId": "fa3st-provider-rwx-all",
+            "enabled": true,
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-provider-rwx-all-clientsecret>",
+            "publicClient": false,
+            "serviceAccountsEnabled": true,
+            "standardFlowEnabled": false,
+            "directAccessGrantsEnabled": false,
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ]
+        },
+        {
+            "clientId": "fa3st-provider-rwx-nameplate",
+            "enabled": true,
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-provider-rwx-nameplate-clientsecret>",
+            "publicClient": false,
+            "serviceAccountsEnabled": true,
+            "standardFlowEnabled": false,
+            "directAccessGrantsEnabled": false,
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ]
+        },
+        {
+            "clientId": "fa3st-provider-r-all",
+            "enabled": true,
+            "secret": "<path:factory-x-ci-cd/data/blueprint-leo#fa3st-provider-r-all-clientsecret>",
+            "publicClient": false,
+            "serviceAccountsEnabled": true,
+            "standardFlowEnabled": false,
+            "directAccessGrantsEnabled": true,
+            "redirectUris": [
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ]
+        }
+    ]
+}
