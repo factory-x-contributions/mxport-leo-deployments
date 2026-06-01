@@ -1,0 +1,65 @@
+#################################################################
+# Configuration of this file follows SnakeYAML
+# see: https://bitbucket.org/asomov/snakeyaml/wiki/Documentation
+#################################################################
+
+
+#################################################################
+# Configuration of filter chain for issuer https://auth0-style-issuer.com/
+#################################################################
+#Configuration of ClaimsCopyFilter
+!!com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+  issuer: https://auth0-style-issuer.com/
+  claimsMap:
+    sub: sub
+    exp: exp
+    nbf: nbf
+    iat: iat
+---
+#Configuration of OriginalClaimsPreservationFilter
+!!com.siemens.iam.exchange.core.filter.OriginalClaimsPreservationFilter
+  issuer: https://auth0-style-issuer.com/
+  targetClaimValue: "incoming-token-claims"      
+  claimsToPreserve:
+    - iss
+    - sub
+    - jti
+    - cid
+    - user_name
+    - "incoming-token-claims"   
+---
+#Configuration of IssuerPrefixFilter
+!!com.siemens.iam.exchange.core.filter.IssuerPrefixFilter
+  issuer: https://auth0-style-issuer.com/
+  delimiter: "|" 
+  claimsToPrefix:
+    - sub
+    - cid
+    - user_name
+---
+#Configuration of ScopeMappingFilter
+!!com.siemens.iam.exchange.core.filter.ScopeMappingFilter
+  issuer: https://auth0-style-issuer.com/
+  incomingTokenScopeClaimName: scope
+  outgoingTokenScopeClaimName: scope
+  scopesMap:
+    api1.full-access: serviceA.read,serviceA.write
+    api1.read-only: serviceA.read  
+---
+#Configuration of SupportRequestParamScopeFilter
+!!com.siemens.iam.exchange.core.filter.SupportRequestParamScopeFilter
+  issuer: https://auth0-style-issuer.com/
+  outgoingTokenScopeClaimName: scope
+---
+#Configuration of MySampleFilter
+!!com.siemens.iam.exchange.sample.filter.MySampleFilter
+  issuer: https://auth0-style-issuer.com/
+  claimName: sampleClaimWithKeysFromIncomingTokenFromYaml
+---
+#Configuration of MySampleFilter
+!!com.siemens.iam.exchange.sample.filter.FxFilter
+  issuer: https://auth0-style-issuer.com/
+  targetAudience:
+    - url
+  targetIssuer: issuer
+  targetSubject: subject

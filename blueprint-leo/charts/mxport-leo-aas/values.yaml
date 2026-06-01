@@ -1,0 +1,661 @@
+faaast-registry:
+  fullnameOverride: "fx-leo-faaast-registry"
+  image:
+    repository: docker.io/fraunhoferiosb/faaast-registry
+    tag: 1.2.0-SNAPSHOT
+    pullPolicy: Always
+  ingress:
+    enabled: true
+    className: "nginx"
+    tls:
+      - hosts:
+          - fa3st-registry.factory-x.catena-x.net
+        secretName: fx-leo-faaast-registry-tls
+    hosts:
+      - host: fa3st-registry.factory-x.catena-x.net
+        paths:
+          - path: /
+            pathType: Prefix
+    basicAuth:
+      enabled: false
+
+  # possible: q, v, vv, vvv
+  # Important: Don't prefix a dash ("-")
+  # logLevel: v
+
+  server:
+    port: 8090
+    ssl:
+      enabled: false
+
+  persistence:
+    sql:
+      hibernate:
+        # Recommended for first start of database: Creates schema
+        ddlAuto: update
+      datasource:
+        external:
+          enabled: false
+
+faaast-service:
+  fullnameOverride: "fx-leo-faaast-service"
+  image:
+    repository: ghcr.io/factory-x-contributions/fa3st-service
+    tag: fxleo
+    pullPolicy: Always
+
+  registry:
+    aasRegistryBaseUrl: "http://fx-leo-faaast-registry:443"
+    submodelRegistryBaseUrl: "http://fx-leo-faaast-registry:443"
+
+  # Optional: add auth header for registry synchronization requests (e.g. Basic auth for ingress-protected registry)
+  registrySynchronization:
+    auth:
+      header:
+        name: ""
+        value: ""
+
+  persistence:
+    host: "mongodb"
+    port: "27017"
+    database: "faaast-database"
+    username: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+    password: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
+
+  endpoints:
+    - class: "de.fraunhofer.iosb.ilt.faaast.service.endpoint.http.HttpEndpoint"
+      port: 8080
+      hostname: "localhost"
+      subprotocol: ""
+      subprotocolBody: ""
+      subprotocolBodyEncoding: plain
+      corsEnabled: true
+      sslEnabled: false
+      security:
+        enabled: true
+        jwkProvider: "http://fx-leo-token-exchange-provider:9050/sts/jwks"
+
+  messageBus:
+    class: "de.fraunhofer.iosb.ilt.faaast.service.messagebus.internal.MessageBusInternal"
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    tls:
+      - hosts:
+          - fa3st-service.factory-x.catena-x.net
+        secretName: fx-leo-faaast-service-tls
+    hosts:
+      - host: fa3st-service.factory-x.catena-x.net
+        paths:
+          - path: /
+            pathType: Prefix
+
+  seeding:
+    enabled: false
+
+mxport-leo-token-exchange-provider:
+  enabled: true
+  fullnameOverride: "fx-leo-token-exchange-provider"
+  replicaCount: 1
+  image:
+    repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
+    pullPolicy: Always
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 9050
+    targetPort: 9050
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+    host: sts-provider.factory-x.catena-x.net
+    tls: true
+  signingKeySecret: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-provider-private-key>
+  serverConfig: |
+    serviceConfiguration:
+      issuer: https://sts-provider.factory-x.catena-x.net/sts
+      chooseFilterManagerBySubjectToken: true
+      signingKeyAlias: demo-key
+      tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
+      plainkey:
+        keyLocation: signingkey/private_key.pem
+        keyId: demo-key
+      outgoingTokenScopeClaimName: scope
+      forceOverwriteIssuerWithConfiguredValue: false
+      forceOverwriteIatWithNow: false
+      forceNewJti: false
+    issuerSpecificConfiguration:
+      - issuer: https://keycloak.factory-x.catena-x.net/realms/fa3st-provider
+        jwksValue: |
+          <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-provider-keycloak-jwks>
+        connectionTimeoutInMs: 20000
+        readTimeoutInMs: 20000
+        tokenScopeClaimName: scope
+        propagateIssuerToValidators: true
+        disableSubjectTokenClaimsSetValidator: false
+        subjectTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - exchange
+          requiredAudiences:
+            - sts-provider
+          expiryClaimRequired: true
+          expiryCheckDisabled: false
+          nbfClaimRequired: false
+          nbfCheckDisabled: false
+          iatClaimRequired: false
+          iatCheckDisabled: false
+        actorTokenRequired: false
+        actorTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - authentication
+          requiredAudiences:
+            - token
+
+mxport-leo-token-exchange-consumer:
+  enabled: true
+  fullnameOverride: "fx-leo-token-exchange-consumer"
+  replicaCount: 1
+  image:
+    repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
+    pullPolicy: Always
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 9050
+    targetPort: 9050
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+    host: sts-consumer.factory-x.catena-x.net
+    tls: true
+  signingKeySecret: <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-consumer-private-key>
+  serverConfig: |
+    serviceConfiguration:
+      issuer: https://sts-consumer.factory-x.catena-x.net/sts
+      chooseFilterManagerBySubjectToken: true
+      signingKeyAlias: demo-key
+      tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
+      plainkey:
+        keyLocation: signingkey/private_key.pem
+        keyId: demo-key
+      outgoingTokenScopeClaimName: scope
+      forceOverwriteIssuerWithConfiguredValue: false
+      forceOverwriteIatWithNow: false
+      forceNewJti: false
+    issuerSpecificConfiguration:
+      - issuer: https://keycloak.factory-x.catena-x.net/realms/fa3st-consumer
+        jwksValue: |
+          <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-consumer-keycloak-jwks>
+        connectionTimeoutInMs: 20000
+        readTimeoutInMs: 20000
+        tokenScopeClaimName: scope
+        propagateIssuerToValidators: true
+        disableSubjectTokenClaimsSetValidator: false
+        subjectTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - exchange
+          requiredAudiences:
+            - sts-consumer
+          expiryClaimRequired: true
+          expiryCheckDisabled: false
+          nbfClaimRequired: false
+          nbfCheckDisabled: false
+          iatClaimRequired: false
+          iatCheckDisabled: false
+        actorTokenRequired: false
+        actorTokenClaimsSetValidator:
+          issuerRequired: true
+          requiredScopes:
+            - authentication
+          requiredAudiences:
+            - token
+
+aas-basyx-v2-full:
+  # Deprecated legacy BaSyx Mosquitto configuration removed; RabbitMQ (with MQTT/WebSockets) is used instead.
+  mqtt:
+    enabled: false  # keep flag for compatibility; no additional settings required
+
+  mongodb:
+    enabled: false
+
+  keycloak:
+    enabled: true
+    fullnameOverride: "fx-leo-basyx-keycloak"
+    postgresql:
+      enabled: true
+      image:
+        repository: "bitnamilegacy/postgresql"
+        tag: "17.4.0-debian-12-r19"
+      auth:
+        username: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-user>
+        password: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-pw>
+        database: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pg-db>
+      primary:
+        initdb: {}
+    ingress:
+      enabled: true
+      ingressClassName: "nginx"
+      hostname: keycloak.factory-x.catena-x.net
+      tls: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/enable-cors: 'true'
+    auth:
+      adminUser: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-user>
+      adminPassword: <path:factory-x-ci-cd/data/blueprint-leo#keycloak-pw>
+    extraVolumes:
+      - name: fx-leo-basyx-realm
+        configMap:
+          name: fx-leo-basyx-realm
+      - name: fx-leo-rabbitmq-realm
+        configMap:
+          name: fx-leo-rabbitmq-realm
+      - name: fx-leo-fa3st-provider-realm
+        configMap:
+          name: fx-leo-fa3st-provider-realm
+      - name: fx-leo-fa3st-consumer-realm
+        configMap:
+          name: fx-leo-fa3st-consumer-realm
+    extraVolumeMounts:
+      - mountPath: /opt/bitnami/keycloak/data/import/basyx-realm.json
+        subPath: basyx-realm.json
+        name: fx-leo-basyx-realm
+      - mountPath: /opt/bitnami/keycloak/data/import/rabbitmq-realm.json
+        subPath: rabbitmq-realm.json
+        name: fx-leo-rabbitmq-realm
+      - mountPath: /opt/bitnami/keycloak/data/import/fa3st-provider-realm.json
+        subPath: fa3st-provider-realm.json
+        name: fx-leo-fa3st-provider-realm
+      - mountPath: /opt/bitnami/keycloak/data/import/fa3st-consumer-realm.json
+        subPath: fa3st-consumer-realm.json
+        name: fx-leo-fa3st-consumer-realm
+    args: ["/bin/sh -c 'kc.sh start-dev --import-realm --hostname-strict=false --proxy-headers=xforwarded --http-enabled=true --features=token-exchange'"]
+
+  aas-registry:
+    # Enabled
+    enabled: false
+
+  sm-registry:
+    enabled: true
+
+  aas-discovery:
+    # Enabled
+    enabled: true
+
+  # Also needs an ingress.
+  aas-environment:
+    enabled: true
+    image:
+      name: eclipsebasyx/aas-environment:2.0.0-SNAPSHOT
+      pullPolicy: Always
+    service:
+      port: 8081
+    config: |-
+      server.port=8081
+
+      basyx.backend = InMemory
+
+      #basyx.environment=file:aas
+
+      logging.level.root=DEBUG
+
+      basyx.cors.allowed-origins=*
+      basyx.cors.allowed-methods=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      basyx.aasrepository.feature.registryintegration=https://basyx-env.factory-x.catena-x.net
+      basyx.externalurl=https://basyx-env.factory-x.catena-x.net
+      spring.servlet.multipart.max-file-size=128MB
+      spring.servlet.multipart.max-request-size=128MB
+
+      # MQTT configuration
+      basyx.aasrepository.feature.mqtt.enabled = false
+      basyx.submodelrepository.feature.mqtt.enabled = false
+
+      basyx.feature.authorization.enabled = true
+      basyx.feature.authorization.type = rbac
+      basyx.feature.authorization.jwtBearerTokenProvider = keycloak
+      basyx.feature.authorization.rbac.file = file:/application/rbac-rules.json
+
+      spring.security.oauth2.resourceserver.jwt.issuer-uri = https://keycloak.factory-x.catena-x.net/realms/basyx
+      spring.data.mongodb.uri=mongodb://<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>:<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>@fx-leo-mongodb
+      spring.data.mongodb.port=27017
+      spring.data.mongodb.database=factoryx-mongo-db
+      spring.data.mongodb.username=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+      spring.data.mongodb.password=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
+
+    ingress:
+      enabled: true
+      host: basyx-env.factory-x.catena-x.net
+      tls: true
+      ingressClassName: "nginx"
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-body-size: 150m
+    rbac:
+      rules: |
+        [
+          {
+            "role": "admin",
+            "action": ["CREATE", "READ", "UPDATE", "DELETE" ],
+            "targetInformation": {
+              "@type": "concept-description",
+              "conceptDescriptionIds": "*"
+            }
+          },
+          {
+            "role": "admin",
+            "action": [ "CREATE", "READ", "UPDATE", "DELETE" ],
+            "targetInformation": {
+              "@type": "aas",
+              "aasIds": "*"
+            }
+          },
+          {
+            "role": "admin",
+            "action": [ "CREATE", "READ", "UPDATE", "DELETE", "EXECUTE" ],
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "admin",
+            "action": [ "CREATE", "READ", "UPDATE", "DELETE" ],
+            "targetInformation": {
+              "@type": "aas-environment",
+              "aasIds": "*",
+              "submodelIds": "*"
+            }
+          },
+          {
+            "role": "basyx-reader",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-reader-two",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-sme-reader",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": [
+                "specificSubmodelId",
+                "testSMId1",
+                "testSMId2"
+              ],
+              "submodelElementIdShortPaths": [
+                "testSMEIdShortPath1",
+                "smc2.specificSubmodelElementIdShort",
+                "testSMEIdShortPath2"
+              ]
+            }
+          },
+          {
+            "role": "basyx-sme-reader-two",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          },
+          {
+            "role": "basyx-updater",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-updater-two",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-sme-updater",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          },
+          {
+            "role": "basyx-sme-updater-two",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "smc2"
+            }
+          },
+          {
+            "role": "basyx-sme-updater-three",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "smc1.specificSubmodelElementIdShort-2"
+            }
+          },
+          {
+            "role": "basyx-file-sme-updater",
+            "action": "UPDATE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          },
+          {
+            "role": "basyx-deleter",
+            "action": "DELETE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-deleter-two",
+            "action": "DELETE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-executor",
+            "action": "EXECUTE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "*",
+              "submodelElementIdShortPaths": "*"
+            }
+          },
+          {
+            "role": "basyx-executor-two",
+            "action": "EXECUTE",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId",
+              "submodelElementIdShortPaths": "square"
+            }
+          },
+          {
+            "role": "basyx-file-sme-reader",
+            "action": "READ",
+            "targetInformation": {
+              "@type": "submodel",
+              "submodelIds": "specificSubmodelId-2",
+              "submodelElementIdShortPaths": "smc2.specificFileSubmodelElementIdShort"
+            }
+          }
+        ]
+
+  aas-digitaltwinregistry:
+    enabled: false
+    image:
+      name: eclipsebasyx/digitaltwinregistry:2.0.0-SNAPSHOT
+      pullPolicy: Always
+    service:
+      port: 8081
+    ingress:
+      enabled: false
+      host: "basyx-dtr.local"
+      tls: false
+      ingressClassName: "nginx"
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/enable-cors: "true"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # Application configuration split into profiles; these are embedded into a ConfigMap
+    application: |
+      basyx.aasdiscoveryservice.name=digital-twin-registry
+      basyx.cors.allowed-methods=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      basyx.cors.allowed-origins=*
+      basyx.feature.aasregistry.discoveryintegration.enabled=true
+      basyx.feature.aasregistry.discoveryintegration.baseUrl=http://localhost:8081
+      basyx.endpoints.web.exposure.include=health,metrics,mappings
+      server.port=8081
+      spring.profiles.active=logEvents,MongoDB
+      spring.main.allow-bean-definition-overriding=true
+      spring.application.name=BaSyx Digital Twin Registry
+      description.profiles=https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-001,https://admin-shell.io/aas/API/3/0/AssetAdministrationShellRegistryServiceSpecification/SSP-002,https://admin-shell.io/aas/API/3/0/DiscoveryServiceSpecification/SSP-001
+      logging.level.root=INFO
+      logging.level.org.eclipse.digitaltwin.basyx=DEBUG
+      springdoc.api-docs.enabled=true
+      springdoc.swagger-ui.enabled=true
+      springdoc.swagger-ui.path=/swagger-ui.html
+      springdoc.swagger-ui.csrf.enabled=false
+    application-MongoDB: |
+      spring.config.activate.on-profile=MongoDB
+      spring.data.mongodb.authentication-database=admin
+      spring.data.mongodb.database=factoryx-dtr-db
+      spring.data.mongodb.host=fx-leo-mongodb
+      spring.data.mongodb.port=27017
+      spring.data.mongodb.username=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+      spring.data.mongodb.password=<path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
+      basyx.backend=MongoDB
+      basyx.aasdiscoveryservice.mongodb.collectionName=factoryx-dtr-db
+      registry.type=MongoDB
+      registry.discovery.enabled=true
+
+  # Needs specific ingress.
+  aas-web-ui:
+    enabled: false
+
+mongodb:
+  enabled: true
+  architecture: standalone
+  image:
+    repository: bitnamilegacy/mongodb
+    tag: "8.0.13"
+    pullPolicy: IfNotPresent
+  auth:
+    rootUser: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-user>
+    rootPassword: <path:factory-x-ci-cd/data/blueprint-leo#mongodb-admin-pw>
+  replicaSetName: rs0
+
+  persistence:
+    size: 8Gi
+    storageClassName: default
+  service:
+    nameOverride: fx-leo-mongodb
+
+rabbitmq:
+  ingress:
+    enabled: false
+    certManager:
+      enabled: false
+
+company-lookup:
+  enabled: true
+  image:
+    repository: eclipsebasyx/companylookup-go
+    tag: SNAPSHOT
+    pullPolicy: Always
+  server:
+    port: 5080
+  postgresqlHostOverride: "company-lookup-postgresql"
+  postgresql:
+    enabled: false
+    auth:
+      username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
+      password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
+      database: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db>
+    primary:
+      service:
+        ports:
+          postgresql: 5433
+      containerPorts:
+        postgresql: 5433
+
+company-lookup-postgresql:
+  enabled: true
+  fullnameOverride: "company-lookup-postgresql"
+  image:
+    repository: bitnamilegacy/postgresql
+    tag: "17.6.0-debian-12-r4"
+  auth:
+    username: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-user>
+    password: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-pw>
+    database: <path:factory-x-ci-cd/data/blueprint-leo#company-lookup-pg-db>
+  primary:
+    service:
+      ports:
+        postgresql: 5433
+    containerPorts:
+      postgresql: 5433
+  ingress:
+    enabled: true
+    host: company-lookup.factory-x.catena-x.net
+    tls: true
+    ingressClassName: "nginx"
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-body-size: 150m
+  seedData:
+    enabled: true

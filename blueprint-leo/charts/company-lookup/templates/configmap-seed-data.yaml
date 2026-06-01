@@ -1,0 +1,213 @@
+# Copyright 2026 Factory-X Consortia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{{- if .Values.seedData.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "company-lookup.fullname" . }}-seed-script
+  labels:
+    {{- include "company-lookup.labels" . | nindent 4 }}
+data:
+  seed.sh: |
+    #!/bin/sh
+    set -e
+
+    COMPANY_LOOKUP_URL="http://{{ include "company-lookup.fullname" . }}:{{ .Values.service.port }}"
+
+    echo "Waiting for Company Lookup to be ready..."
+    max_attempts=60
+    attempt=0
+
+    while [ $attempt -lt $max_attempts ]; do
+        if curl -fsS -o /dev/null "${COMPANY_LOOKUP_URL}/health"; then
+            echo "Company Lookup is healthy!"
+            break
+        fi
+        attempt=$((attempt + 1))
+        echo "Attempt ${attempt}/${max_attempts} - Service not ready yet, waiting..."
+        sleep 5
+    done
+
+    if [ $attempt -eq $max_attempts ]; then
+        echo "Error: Company Lookup did not become healthy in time"
+        exit 1
+    fi
+
+    sleep 2
+
+    echo "Pre-filling Company Lookup with sample data..."
+
+    post_company() {
+        label=$1
+        file=$2
+        echo "Adding ${label}..."
+        body=$(mktemp)
+        status=$(curl -sS -o "${body}" -w "%{http_code}" -X POST "${COMPANY_LOOKUP_URL}/companies" \
+            -H "Content-Type: application/json" \
+            --data-binary @"${file}")
+        echo "  HTTP ${status}"
+        echo "  response: $(cat "${body}")"
+        rm -f "${body}"
+        if [ "${status}" -ge 400 ]; then
+            echo "Error: POST ${label} failed with HTTP ${status}"
+            return 1
+        fi
+    }
+
+    post_company "Fraunhofer IESE" /data/fraunhofer-iese.json
+    post_company "Example Company" /data/example-company.json
+
+    echo "All sample data has been successfully added to Company Lookup!"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "company-lookup.fullname" . }}-seed-data
+  labels:
+    {{- include "company-lookup.labels" . | nindent 4 }}
+data:
+  fraunhofer-iese.json: |
+    {
+      "description": [
+        {
+          "language": "en",
+          "text": "The Fraunhofer Institute for Experimental Software Engineering IESE in Kaiserslautern is a research institute specializing in efficient software and systems engineering."
+        }
+      ],
+      "displayName": [
+        {
+          "language": "en",
+          "text": "Fraunhofer Institute for Experimental Software Engineering IESE"
+        }
+      ],
+      "administration": {
+        "version": "1",
+        "revision": "0",
+        "creator": {
+          "type": "ExternalReference",
+          "keys": [
+            {
+              "type": "GlobalReference",
+              "value": "https://iese.fraunhofer.de"
+            }
+          ]
+        }
+      },
+      "endpoints": [
+        {
+          "protocolInformation": {
+            "href": "https://demo.digital-twin.host/aas-registry",
+            "endpointProtocol": "HTTPS"
+          },
+          "interface": "AAS-REGISTRY-3.0"
+        },
+        {
+          "protocolInformation": {
+            "href": "https://demo.digital-twin.host/aas-discovery",
+            "endpointProtocol": "HTTPS"
+          },
+          "interface": "AAS-DISCOVERY-3.0"
+        },
+        {
+          "protocolInformation": {
+            "href": "https://demo.digital-twin.host/aas-repository",
+            "endpointProtocol": "HTTPS"
+          },
+          "interface": "AAS-REPOSITORY-3.0"
+        },
+        {
+          "protocolInformation": {
+            "href": "https://demo.digital-twin.host/submodel-registry",
+            "endpointProtocol": "HTTPS"
+          },
+          "interface": "SUBMODEL-REGISTRY-3.0"
+        },
+        {
+          "protocolInformation": {
+            "href": "https://demo.digital-twin.host/submodel-repository",
+            "endpointProtocol": "HTTPS"
+          },
+          "interface": "SUBMODEL-REPOSITORY-3.0"
+        },
+        {
+          "protocolInformation": {
+            "href": "https://demo.digital-twin.host/aasx-file",
+            "endpointProtocol": "HTTPS"
+          },
+          "interface": "AASX-FILE-3.0"
+        }
+      ],
+      "idShort": "fraunhoferIese",
+      "name": "Fraunhofer IESE",
+      "domain": "iese.fraunhofer.de",
+      "nameOptions": [
+        "Fraunhofer-Institut für Experimentelles Software-Engineering",
+        "IESE",
+        "IESE Fraunhofer"
+      ],
+      "assetIdRegexPatterns": [
+        "^https://i\\.iese\\.fraunhofer\\.de/assetId/",
+        "^https://i\\.fraun-iese\\.de/assetId/"
+      ]
+    }
+  example-company.json: |
+    {
+      "description": [
+        {
+          "language": "en",
+          "text": "An example company."
+        }
+      ],
+      "displayName": [
+        {
+          "language": "en",
+          "text": "Example Company"
+        }
+      ],
+      "administration": {
+        "version": "1",
+        "revision": "0",
+        "creator": {
+          "type": "ExternalReference",
+          "keys": [
+            {
+              "type": "GlobalReference",
+              "value": "https://examplecompany.de"
+            }
+          ]
+        }
+      },
+      "endpoints": [
+        {
+          "protocolInformation": {
+            "href": "https://demo.digital-twin.host/aas-discovery",
+            "endpointProtocol": "HTTPS"
+          },
+          "interface": "AAS-DISCOVERY-3.0"
+        }
+      ],
+      "idShort": "exampleCompany1",
+      "name": "ExCom1",
+      "domain": "ex.com.1.de",
+      "nameOptions": [
+        "Example Company 1",
+        "EC1",
+        "Com Example 1"
+      ],
+      "assetIdRegexPatterns": [
+        "^https://i\\.excom1\\.de/assetId/"
+      ]
+    }
+{{- end }}

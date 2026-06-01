@@ -1,0 +1,6 @@
+apiVersion: v2
+name: company-lookup
+description: A Helm chart for BaSyx Company Lookup
+type: application
+version: 0.1.0
+appVersion: "SNAPSHOT"

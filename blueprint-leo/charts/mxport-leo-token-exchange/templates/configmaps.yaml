@@ -1,0 +1,41 @@
+# Copyright 2026 Factory-X Consortia
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mxport-leo-token-exchange.fullname" . }}-server-config
+data:
+  server-config.yml: |
+{{ .Values.serverConfig | default (.Files.Get "server-config.yaml") | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mxport-leo-token-exchange.fullname" . }}-filter-config
+data:
+  filter-config.yml: |
+{{ .Values.filterConfig | default (.Files.Get "filter-config.yaml") | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mxport-leo-token-exchange.fullname" . }}-trusted-list
+data:
+  signed_example_trusted_list.xml: |
+{{ .Files.Get "trusted-list/signed_example_trusted_list.xml" | indent 4 }}
+  rsa_public.pem: |
+{{ .Files.Get "trusted-list/rsa_public.pem" | indent 4 }}
+  19612_xsd.xsd: |
+{{ .Files.Get "trusted-list/19612_xsd.xsd" | indent 4 }}

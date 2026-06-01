@@ -1,0 +1,45 @@
+#Configuration of the token exchange service
+#Properties here are especially used for issueing tokens
+serviceConfiguration:
+  #Token Exchange Issuer name (used as "iss" claim in issued tokens)
+  issuer: https://sts.factory-x.catena-x.net/sts
+  #Choose filter manager by subject token (value: true) or actor token (value: false)
+  chooseFilterManagerBySubjectToken: true
+  #Alias of the signing key which is used as key-id in the issued tokens
+  signingKeyAlias: demo-key
+  tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
+  plainkey:
+    keyLocation: signingkey/private_key.pem
+    keyId: demo-key
+  outgoingTokenScopeClaimName: scope
+  forceOverwriteIssuerWithConfiguredValue: false
+  forceOverwriteIatWithNow: false
+  forceNewJti: false
+issuerSpecificConfiguration:
+  - issuer: https://keycloak.factory-x.catena-x.net/realms/fa3st
+    jwksValue: |
+      <path:factory-x-ci-cd/data/blueprint-leo#token-exchange-keycloak-jwks>
+    connectionTimeoutInMs: 20000
+    readTimeoutInMs: 20000
+    tokenScopeClaimName: scope
+    propagateIssuerToValidators: true
+    disableSubjectTokenClaimsSetValidator: false
+    subjectTokenClaimsSetValidator:
+      issuerRequired: true
+      requiredScopes:
+        - exchange
+      requiredAudiences:
+        - sts
+      expiryClaimRequired: true
+      expiryCheckDisabled: false
+      nbfClaimRequired: false
+      nbfCheckDisabled: false
+      iatClaimRequired: false
+      iatCheckDisabled: false
+    actorTokenRequired: false
+    actorTokenClaimsSetValidator:
+      issuerRequired: true
+      requiredScopes:
+        - authentication
+      requiredAudiences:
+        - token
