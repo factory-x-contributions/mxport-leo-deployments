@@ -1,3 +1,17 @@
+# Copyright 2026 Codewerk GmbH
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 global:
   security:
     allowInsecureImages: true # needed because bitnami is now in bitnamilegacy
@@ -10,7 +24,7 @@ gateway-sts:
 
   image:
     repository: ghcr.io/factory-x-contributions/mxport-leo-gateway
-    tag: latest
+    tag: openresty-sts-module
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
@@ -359,6 +373,7 @@ sts-chart:
   filterConfig:
   - filterType: com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
     issuer: "https://<path:factory-x-ci-cd/data/gateway-sts-consumer#sts-host>/sts"
+    audience: provider-aas-environment
     parameters:
       claimsMap:
         jti: jti
@@ -367,10 +382,12 @@ sts-chart:
         sub: sub
   - filterType: com.siemens.iam.exchange.sample.filter.BasyxFilter
     issuer: "https://<path:factory-x-ci-cd/data/gateway-sts-consumer#sts-host>/sts"
+    audience: provider-aas-environment
     parameters:
       targetAudience: "basyx-client-api"
   - filterType: com.siemens.iam.exchange.core.filter.ClaimsAppenderFilter
     issuer: "https://<path:factory-x-ci-cd/data/gateway-sts-consumer#sts-host>/sts"
+    audience: provider-aas-environment
     parameters:
         claimsMap:
          iss: "https://<path:factory-x-ci-cd/data/gateway-sts-provider#sts-host>/sts"
