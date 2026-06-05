@@ -13,19 +13,19 @@
 # limitations under the License.
 
 meta {
-  name: 3 - Provider Environment Shells
+  name: 2 - Consumer Gateway
   type: http
-  seq: 3
+  seq: 2
 }
 
-head {
-  url: {{provider_endpoint}}/shells
+get {
+  url: {{consumer_gateway}}/external/aas-environment.provider.basyx-leo.factory-x.catena-x.net/shells
   body: none
   auth: bearer
 }
 
 auth:bearer {
-  token: {{fx_token}}
+  token: {{access_token}}
 }
 
 tests {
