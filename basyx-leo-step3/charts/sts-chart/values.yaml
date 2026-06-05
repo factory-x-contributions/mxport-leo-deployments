@@ -1,0 +1,122 @@
+# Copyright 2026 Codewerk GmbH
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+nameOverride: security-token-service
+
+image:
+  repository: ghcr.io/factory-x-contributions/mxport-leo-token-exchange
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  tls: false
+  hosts:
+    - host: tokenservice
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+autoscaling:
+  enabled: false
+
+serviceAccount:
+  create: false
+
+resources: {}
+
+environment:
+  springTokenExchangeConfigLocation: server-config/server-config.yml
+  serverContextPath: /sts
+
+trustlist:
+  enabled: false
+  location: trusted-list/signed_example_trusted_list.xml
+  schema: trusted-list/19612_xsd.xsd
+  publicKey: trusted-list/rsa_public.pem
+
+extraVolumes: []
+extraVolumeMounts: []
+
+# Token Exchange Service -- Server Config
+serverConfig:
+  issuer: http://tokenservice/sts
+  signingKeyAlias: demo-key
+  tokenExchangeFilterConfigurationYml: filter-config/filter-config.yml
+  keystore:
+    keystoreLocation: signingkey/keystore.jks
+    keystorePassword: changeit
+    keyPassword: changeit
+    keyAlias: demo-key
+    keystoreType: JKS
+  issuerSpecificConfiguration:
+    - issuer: http://keycloak/realms/sts-realm
+      jwks:
+        jwksType: "uri"
+        jwksUri: http://keycloak/realms/sts-realm/protocol/openid-connect/certs
+
+# Token Exchange Service -- Filter Config
+filterConfig:
+  - filterType: com.siemens.iam.exchange.core.filter.ClaimsCopyFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      claimsMap:
+        sub: sub
+        exp: exp
+        nbf: nbf
+        iat: iat
+  - filterType: com.siemens.iam.exchange.core.filter.OriginalClaimsPreservationFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      targetClaimValue: "incoming-token-claims"
+      claimsToPreserve:
+        - iss
+        - sub
+        - jti
+        - cid
+        - user_name
+        - "incoming-token-claims"
+  - filterType: com.siemens.iam.exchange.core.filter.IssuerPrefixFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      delimiter: "|"
+      claimsToPrefix:
+        - sub
+        - cid
+        - user_name
+  - filterType: com.siemens.iam.exchange.core.filter.ScopeMappingFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      incomingTokenScopeClaimName: scope
+      outgoingTokenScopeClaimName: scope
+      scopesMap:
+        api1.full-access: serviceA.read,serviceA.write
+        api1.read-only: serviceA.read
+  - filterType: com.siemens.iam.exchange.core.filter.SupportRequestParamScopeFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      outgoingTokenScopeClaimName: scope
+  - filterType: com.siemens.iam.exchange.core.filter.UaaStyleAudienceFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      outgoingTokenScopeClaimName: scope
+  - filterType: com.siemens.iam.exchange.sample.filter.MySampleFilter
+    issuer: http://keycloak/realms/sts-realm
+    parameters:
+      claimName: sampleClaimWithKeysFromIncomingTokenFromYaml
