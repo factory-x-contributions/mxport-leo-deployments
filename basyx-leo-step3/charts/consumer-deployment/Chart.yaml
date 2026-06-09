@@ -13,12 +13,16 @@
 # limitations under the License.
 
 apiVersion: v2
-name: basyx-keycloak-auth
+name: consumer-deployment
 description: A Helm chart for Kubernetes
 dependencies:
-  - name: aas-basyx-v2-full
-    version: 2.0.7
-    repository: "https://eclipse-basyx.github.io/charts/"
+  - name: sts-chart
+    version: 0.1.0
+    repository: "file://../sts-chart"
+  - repository: https://charts.bitnami.com/bitnami
+    name: keycloak
+    version: 24.4.11
+    condition: keycloak.enabled
 
 # A chart can be either an 'application' or a 'library' chart.
 #

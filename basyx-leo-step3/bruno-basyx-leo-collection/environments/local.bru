@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: test-realm
-data:
-  test-realm.json: |-
-{{ .Files.Get "config/test-realm.json" | indent 4 }}
+vars {
+  keycloak_base: https://keycloak.consumer.basyx-leo.factory-x.catena-x.net
+  consumer_gateway: https://gateway.consumer.basyx-leo.factory-x.catena-x.net
+  realm: consumer-realm
+  client_id: democlient
+}
+
+vars:secret [
+  client_secret
+]

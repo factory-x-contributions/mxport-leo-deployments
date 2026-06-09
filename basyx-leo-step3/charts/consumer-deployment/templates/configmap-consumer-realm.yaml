@@ -15,7 +15,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: test-realm
+  name: consumer-realm
 data:
-  test-realm.json: |-
-{{ .Files.Get "config/test-realm.json" | indent 4 }}
+  consumer-realm.json: |-
+{{ .Files.Get "config/consumer-realm.json" | indent 4 }}
