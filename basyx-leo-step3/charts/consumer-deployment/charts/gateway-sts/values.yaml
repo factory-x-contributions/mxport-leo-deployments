@@ -1,0 +1,97 @@
+# Copyright 2026 Codewerk GmbH
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Default values for gateway-service.
+
+replicaCount: 1
+
+# Image must currently exist in the local Docker Cache manually!
+image:
+  repository: openresty-sts:dev
+  tag: dev
+  pullPolicy: Never
+
+imagePullSecrets: []
+
+nameOverride: gateway-sts
+fullnameOverride: gateway-sts
+
+containerPort: 80
+
+serviceAccount:
+  create: false
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  tls: false
+  hosts:
+    - host: gateway-sts
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+
+autoscaling:
+  enabled: false
+
+customConfig:
+  enabled: false
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

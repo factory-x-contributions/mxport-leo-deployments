@@ -12,13 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: acl-folder
-  namespace: aas-local
-data: # will load all files in config/acl/
-{{- range $path, $file := .Files.Glob "config/acl/*.json" }}
-  {{ base $path }}: |-
-{{ $file | toString | indent 4 }}
-{{- end }}
+meta {
+  name: 2 - Consumer Gateway
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{consumer_gateway}}/external/aas-environment.provider.basyx-leo.factory-x.catena-x.net/shells
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+tests {
+  test("status is success", function() {
+    expect(res.getStatus()).to.be.below(400);
+  });
+}

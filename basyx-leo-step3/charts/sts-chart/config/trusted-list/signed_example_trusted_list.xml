@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><TrustServiceStatusList xmlns="http://uri.etsi.org/02231/v2#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="TrustServiceStatusList-1" TSLTag="http://uri.etsi.org/TrstSvc/TrustedList/TSLTag" xsi:schemaLocation="http://uri.etsi.org/02231/v2# https://forge.etsi.org/rep/esi/x19_612_trusted_lists/-/raw/v2.4.1/19612_xsd.xsd">
+  	
+  <SchemeInformation>
+    		
+    <TSLVersionIdentifier>4</TSLVersionIdentifier>
+    		
+    <TSLSequenceNumber>149</TSLSequenceNumber>
+    		
+    <TSLType>http://MxLeo/TrstSvc/TrustedList/TSLType/EUgeneric</TSLType>
+    		
+    <SchemeOperatorName>
+      			
+      <Name xml:lang="en">Operating Company for MX-Port Leo</Name>
+      		
+    </SchemeOperatorName>
+    		
+    <SchemeOperatorAddress>
+      			
+      <PostalAddresses>
+        				
+        <PostalAddress xml:lang="en">
+          					
+          <StreetAddress>Leo Str</StreetAddress>
+          					
+          <Locality>Leoland</Locality>
+          					
+          <PostalCode>12345</PostalCode>
+          					
+          <CountryName>DE</CountryName>
+          				
+        </PostalAddress>
+        			
+      </PostalAddresses>
+      			
+      <ElectronicAddress>
+        				
+        <URI xml:lang="en">mailto:MxLeo@fx.de</URI>
+        				
+        <URI xml:lang="en">https://MxLeo/TL-Links/repository.html</URI>
+        			
+      </ElectronicAddress>
+      		
+    </SchemeOperatorAddress>
+    		
+    <SchemeName>
+      			
+      <Name xml:lang="en">Trusted list for MX-Port Leo</Name>
+      		
+    </SchemeName>
+    		
+    <SchemeInformationURI>
+      			
+      <URI xml:lang="en">https://MxLeo/TL-Links/tsl_e.html</URI>
+      		
+    </SchemeInformationURI>
+    		
+    <StatusDeterminationApproach>http://uri.etsi.org/TrstSvc/TrustedList/StatusDetn/EUappropriate</StatusDeterminationApproach>
+    		
+    <SchemeTypeCommunityRules>
+      			
+      <URI xml:lang="en">http://MxLeo/TrstSvc/TrustedList/schemerules/EUcommon</URI>
+      		
+    </SchemeTypeCommunityRules>
+    		
+    <SchemeTerritory>EU</SchemeTerritory>
+    		
+    <PolicyOrLegalNotice>
+      			
+      <TSLLegalNotice xml:lang="en">The applicable legal framework for the present trusted list is Regulation (EU) No 910/2014...</TSLLegalNotice>
+      		
+    </PolicyOrLegalNotice>
+    		
+    <HistoricalInformationPeriod>65535</HistoricalInformationPeriod>
+    		
+    <ListIssueDateTime>2025-09-16T12:30:00Z</ListIssueDateTime>
+    		
+    <NextUpdate>
+      			
+      <dateTime>2026-03-16T13:30:00Z</dateTime>
+      		
+    </NextUpdate>
+    		
+    <DistributionPoints>
+      			
+      <URI>https://MxLeo/TL-MxPort.xml</URI>
+      		
+    </DistributionPoints>
+    	
+  </SchemeInformation>
+  	
+  <TrustServiceProviderList>
+    		
+    <TrustServiceProvider>
+      			
+      <TSPInformation>
+        				
+        <TSPName>
+          					
+          <Name xml:lang="de">Siemens</Name>
+          				
+        </TSPName>
+        				
+        <TSPTradeName>
+          					
+          <Name xml:lang="en">Siemens AG</Name>
+          				
+        </TSPTradeName>
+        				
+        <TSPAddress>
+          					
+          <PostalAddresses>
+            						
+            <PostalAddress xml:lang="en">
+              							
+              <StreetAddress>Werner-von-Siemens-Straße 1</StreetAddress>
+              							
+              <Locality>Munich</Locality>
+              							
+              <PostalCode>80333</PostalCode>
+              							
+              <CountryName>Germany</CountryName>
+              						
+            </PostalAddress>
+            					
+          </PostalAddresses>
+          					
+          <ElectronicAddress>
+            						
+            <URI xml:lang="en">https://www.siemens.com</URI>
+            					
+          </ElectronicAddress>
+          				
+        </TSPAddress>
+        				
+        <TSPInformationURI>
+          					
+          <URI xml:lang="en">https://www.siemens.com/global/en/general/legal.html</URI>
+          				
+        </TSPInformationURI>
+        				
+        <TSPInformationExtensions>
+          				  
+          <Extension Critical="true">
+            					
+            <TSPDomainName>siemens.com</TSPDomainName>
+            				  
+          </Extension>
+          				
+        </TSPInformationExtensions>
+        			
+      </TSPInformation>
+      			
+      <TSPServices>
+        				
+        <TSPService>
+          					
+          <ServiceInformation>
+            						
+            <ServiceTypeIdentifier>http://uri.etsi.org/TrstSvc/Svctype/RA/nothavingPKIid</ServiceTypeIdentifier>
+            						
+            <ServiceName>
+              							
+              <Name xml:lang="en">Factory-X Central Consumer STS</Name>
+              						
+            </ServiceName>
+            						
+            <ServiceDigitalIdentity>
+              						  
+              <DigitalId>
+                							
+                <Other>
+                  							  
+                  <URI>https://iam-security-training.com/consumer/sts</URI>
+                  							
+                </Other>
+                						  
+              </DigitalId>
+              						
+            </ServiceDigitalIdentity>
+            						
+            <ServiceStatus>http://uri.etsi.org/TrstSvc/TrustedList/Svcstatus/granted</ServiceStatus>
+            						
+            <StatusStartingTime>2025-09-16T12:30:00Z</StatusStartingTime>
+            						
+            <ServiceSupplyPoints>
+              						    
+              <ServiceSupplyPoint>https://iam-security-training.com/consumer/sts</ServiceSupplyPoint>
+              						
+            </ServiceSupplyPoints>
+            					
+          </ServiceInformation>
+          				
+        </TSPService>
+        				
+        <TSPService>
+          					
+          <ServiceInformation>
+            						
+            <ServiceTypeIdentifier>http://uri.etsi.org/TrstSvc/Svctype/RA/nothavingPKIid</ServiceTypeIdentifier>
+            						
+            <ServiceName>
+              							
+              <Name xml:lang="en">Factory-X Central Provider STS</Name>
+              						
+            </ServiceName>
+            						
+            <ServiceDigitalIdentity>
+              						  
+              <DigitalId>
+                							
+                <Other>
+                  							  
+                  <URI>https://iam-security-training.com/provider/sts</URI>
+                  							
+                </Other>
+                						  
+              </DigitalId>
+              						
+            </ServiceDigitalIdentity>
+            						
+            <ServiceStatus>http://uri.etsi.org/TrstSvc/TrustedList/Svcstatus/granted</ServiceStatus>
+            						
+            <StatusStartingTime>2025-09-16T12:30:00Z</StatusStartingTime>
+            						
+            <ServiceSupplyPoints>
+              						    
+              <ServiceSupplyPoint>https://iam-security-training.com/provider/sts</ServiceSupplyPoint>
+              						
+            </ServiceSupplyPoints>
+            					
+          </ServiceInformation>
+          				
+        </TSPService>
+        			
+      </TSPServices>
+      		
+    </TrustServiceProvider>
+    		
+    <TrustServiceProvider>
+      			
+      <TSPInformation>
+        				
+        <TSPName>
+          					
+          <Name xml:lang="de">Local STS Demo</Name>
+          				
+        </TSPName>
+        				
+        <TSPTradeName>
+          					
+          <Name xml:lang="en">VAT-xyz</Name>
+          				
+        </TSPTradeName>
+        				
+        <TSPAddress>
+          					
+          <PostalAddresses>
+            						
+            <PostalAddress xml:lang="en">
+              							
+              <StreetAddress>Factory-X Str 1</StreetAddress>
+              							
+              <Locality>Frankfurt</Locality>
+              							
+              <PostalCode>60549</PostalCode>
+              							
+              <CountryName>DE</CountryName>
+              						
+            </PostalAddress>
+            					
+          </PostalAddresses>
+          					
+          <ElectronicAddress>
+            						
+            <URI xml:lang="en">https://www.demo.factory-x.org</URI>
+            					
+          </ElectronicAddress>
+          				
+        </TSPAddress>
+        				
+        <TSPInformationURI>
+          					
+          <URI xml:lang="en">https://www.demo.factory-x.org/info</URI>
+          				
+        </TSPInformationURI>
+        				
+        <TSPInformationExtensions>
+          				  
+          <Extension Critical="true">
+            					
+            <TSPDomainName>local.com</TSPDomainName>
+            				  
+          </Extension>
+          				
+        </TSPInformationExtensions>
+        			
+      </TSPInformation>
+      			
+      <TSPServices>
+        				
+        <TSPService>
+          					
+          <ServiceInformation>
+            						
+            <ServiceTypeIdentifier>http://uri.etsi.org/TrstSvc/Svctype/RA/nothavingPKIid</ServiceTypeIdentifier>
+            						
+            <ServiceName>
+              							
+              <Name xml:lang="en">Factory-X Demo Consumer STS</Name>
+              						
+            </ServiceName>
+            						
+            <ServiceDigitalIdentity>
+              						  
+              <DigitalId>
+                							
+                <Other>
+                  							  
+                  <URI>http://tokenservice.consumer/sts</URI>
+                  							
+                </Other>
+                						  
+              </DigitalId>
+              						
+            </ServiceDigitalIdentity>
+            						
+            <ServiceStatus>http://uri.etsi.org/TrstSvc/TrustedList/Svcstatus/granted</ServiceStatus>
+            						
+            <StatusStartingTime>2025-09-16T12:30:00Z</StatusStartingTime>
+            						
+            <ServiceSupplyPoints>
+              						    
+              <ServiceSupplyPoint>http://tokenservice.consumer/sts</ServiceSupplyPoint>
+              						
+            </ServiceSupplyPoints>
+            					
+          </ServiceInformation>
+          				
+        </TSPService>
+        				
+        <TSPService>
+          					
+          <ServiceInformation>
+            						
+            <ServiceTypeIdentifier>http://uri.etsi.org/TrstSvc/Svctype/RA/nothavingPKIid</ServiceTypeIdentifier>
+            						
+            <ServiceName>
+              							
+              <Name xml:lang="en">Factory-X Demo Consumer STS</Name>
+              						
+            </ServiceName>
+            						
+            <ServiceDigitalIdentity>
+              						  
+              <DigitalId>
+                							
+                <Other>
+                  							  
+                  <URI>https://sts.consumer.basyx-leo.factory-x.catena-x.net/sts</URI>
+                  							
+                </Other>
+                						  
+              </DigitalId>
+              						
+            </ServiceDigitalIdentity>
+            						
+            <ServiceStatus>http://uri.etsi.org/TrstSvc/TrustedList/Svcstatus/granted</ServiceStatus>
+            						
+            <StatusStartingTime>2025-09-16T12:30:00Z</StatusStartingTime>
+            						
+            <ServiceSupplyPoints>
+              						    
+              <ServiceSupplyPoint>https://sts.consumer.basyx-leo.factory-x.catena-x.net/sts</ServiceSupplyPoint>
+              						
+            </ServiceSupplyPoints>
+            					
+          </ServiceInformation>
+          				
+        </TSPService>
+        			
+      </TSPServices>
+      		
+    </TrustServiceProvider>
+    	
+  </TrustServiceProviderList>
+  
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>y7zeyme7ZRcWQ+LrO6l9o/QyuA0L3XOMIEPHeI5VfPs=</DigestValue></Reference></SignedInfo><SignatureValue>aIUd8Yjz3LAlJ2bWiHUagl5RMK7O/rseaVrWh7whZKM8cuTN2L1XjUeLtGuJhNawDoSV5p4gQ36U&#13;
+nVxFC814alOqVgO23LD9v6541BdMCgqqpryb5qVrZhjSC9NEm6sy//2vAotcJj2IDB+a0N/HJKRz&#13;
+PH8Qshi98NsDbG+Wj65IEJX1tLszhPLPgTto3EEKz+OP/FqmbU75nK9NY50wom+m/DS0lA7rwQnp&#13;
+KS0c9wBy+vwzpO5INNs5Ax/AuB+14EZUw/46JRMQxW1bFmxA/wb1DzCXNm4knlNs7AM7y2ChZaeL&#13;
+EFo7MLfwaytaemQWc+jxQvj6atOOWs1NRoqTaOe+X6mSx4OmjSyqXKzb35k9MKqzs5KxWHrA0qiA&#13;
+lZ7ZJHuaRQMBALLWO2YcQEK32DPnUau72Py4kK7E3IlmanDZtPRdc46Xt/L6iWZzBWe2IsDqCIGj&#13;
+FEy95V60HAfZnNo+vIFeRf90G9G0fKN4PmkOqPkHhezSKmrg2sYv19ee6JIo3T9WxWB7O2K1WSrD&#13;
+1QvAF4TUeEVha+WLBhy9tVAk/6aeW/67FjgvZOlKvbTm+ZmgtkhcOuQ4x4Kbb85/FX+AQtoyKNEN&#13;
+LrMzY0KSDtfTrxkt3MXEn3oor6pRg+JaGXt3L8f8m53C99gmbEaKAWHuGoRkXu5fdcKKzRi4ybo=</SignatureValue><KeyInfo><X509Data><X509Certificate>MIIE9DCCAtygAwIBAgIUYbKwz2LZTMiHv94CS6GV2Uahi1gwDQYJKoZIhvcNAQELBQAwETEPMA0G&#13;
+A1UEAwwGUm9vdENBMB4XDTI1MTIwMzEzMTQ0MVoXDTI2MTIwMzEzMTQ0MVowEzERMA8GA1UEAwwI&#13;
+UlNBIENlcnQwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDSNi56Ky7Jxq2VYHQC2+e3&#13;
+9/BAz67lWdlLa41WwLUqKP9Lztl0JIf9WqhBRVWG9v71eoydqhNMxWv62NpRy7DEKXdhz7ey8ot7&#13;
+48wkfv5tTO7+oeMlV/y8Tp6YTxeOLG8Tvx6AyyZ5cezTkQyedM6YretV1tGk7Xne7nuyFgVng033&#13;
+lcClzvQE1EZvsDDEv4jDloWuih9XxJKU2t9SbSMVKrdNbNW2oQa2Nzz83r9DtYrO/L98bcdbHBqo&#13;
+mktwueXyNCwGNlzlCEod1cl/hyx/uI1nK2pCcAr0iEg5f8w5JHxb6PbBqt3WPIrTIT9vA8djyOlb&#13;
+rvoJ7BN2l2VqpTXu4gUUP7Lkv8+hGdv0QW5+y1J80gE1NrqXCTjraSY59vhpO6NFIRz7IaU7XPgB&#13;
+F5lCC5sfhpCzswllooZ5eM3KvViVr/2LUzd4y7EUFPhhWLOHBX+SGL0ukyuZWmPRYx2n2+iwPNNT&#13;
+WCpPit+VSXUl4FZ6Rys5QE+GUOaTH8U8WJ6Othr8XbZamqWVU2dLbm+mUeE3T8ZNiOEx+D356RCG&#13;
+9fKMCLIHGTtD+d3bdCKkQkyGtvdnkVT01+I8yJVJStcyj2ZyU4ed+C/an8eB7flJhhafvGcli3Xb&#13;
+idFMMvJhAhHxZwJ4RPIUTGOMCRiuj4QYDSpPSKrkydtgj/uThtHHewIDAQABo0IwQDAdBgNVHQ4E&#13;
+FgQUgZvRfEtWXTcVvHm55KdVe5CbvWAwHwYDVR0jBBgwFoAUnFcV8r5eWYGnovwcb2+h2e1nEI8w&#13;
+DQYJKoZIhvcNAQELBQADggIBAMkO1RxCdsN+TghFxrbVwmqDo7RKi4PqhhNWa+4qTRzFDHFqGDYV&#13;
+1TI6OxTCvFPvQ8Af5V9a1xd2MMYEn4SSM+SHWxkltmBmMyNvWa7sKVy5fbfoC8iwmGcYDkPpNIFq&#13;
+7LwgCBMOYE5ukUhrPVRwN3PePtnDwLRGMNgqu4mMvP0L9b+3M1bSQGGjAjxDfQUTTGWBFmh0n9vD&#13;
+BwufYVennX9qKM1oB6rIyI2I60NqDjBqdxoHdoOpcD+SMYuQ1dHmwUBg0o8JTrBNPKpPpyyI8wzA&#13;
+GIKZnF9Xbu2wdTheBx6X5yy0MGBWyijIZUw4T/r6QcPjzn4K/H9DaFyvOx2e4eis5+u2S0890r8t&#13;
+o1gCVz6UQJ/LTDBf8txoTnW75iOUa3xX2ZWRIcdtJNgnxq5qMxg2AU9tVFlUYOLIuBdUNztCiw69&#13;
+RkGRus7mG0eW4BshTiT64spQhOAhM6r4YrBiayolc4n/VlOudewp0gzslbI8II/Ay9CnwsED9Ud7&#13;
+PyKlZ2FppK6qUKFpAPBY+5SzeA/6zmV3GdWdASgfyO8qjNS6ktbvZNodXWyQR07AlCkCtYpsqG+m&#13;
+DFuOyb3LreGvQzvWVs5hohVBmpFLRgIENF2lyV9CF8VGV4DdT2xtd3sLSfY9QC/0Iw/5JbnIg+Ls&#13;
+QdJrItdMj4mi6qAQBqEq8ETG</X509Certificate></X509Data></KeyInfo></Signature></TrustServiceStatusList>

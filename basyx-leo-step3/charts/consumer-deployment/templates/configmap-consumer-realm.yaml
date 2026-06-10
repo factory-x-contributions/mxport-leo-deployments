@@ -15,10 +15,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: acl-folder
-  namespace: aas-local
-data: # will load all files in config/acl/
-{{- range $path, $file := .Files.Glob "config/acl/*.json" }}
-  {{ base $path }}: |-
-{{ $file | toString | indent 4 }}
-{{- end }}
+  name: consumer-realm
+data:
+  consumer-realm.json: |-
+{{ .Files.Get "config/consumer-realm.json" | indent 4 }}
