@@ -1,0 +1,90 @@
+﻿[
+  {
+    "role": "basyx-admin",
+    "action": [
+      "CREATE",
+      "READ",
+      "UPDATE",
+      "DELETE"
+    ],
+    "targetInformation": {
+      "@type": "aas",
+      "aasIds": "*"
+    }
+  },
+  {
+    "role": "basyx-admin",
+    "action": [
+      "CREATE",
+      "READ",
+      "UPDATE",
+      "DELETE",
+      "EXECUTE"
+    ],
+    "targetInformation": {
+      "@type": "submodel",
+      "submodelIds": "*",
+      "submodelElementIdShortPaths": "*"
+    }
+  },
+  {
+    "role": "basyx-admin",
+    "action": [
+      "CREATE",
+      "READ",
+      "UPDATE",
+      "DELETE"
+    ],
+    "targetInformation": {
+      "@type": "concept-description",
+      "conceptDescriptionIds": "*"
+    }
+  },
+  {
+    "role": "basyx-aas-reader",
+    "action": [
+      "READ"
+    ],
+    "targetInformation": {
+      "@type": "aas",
+      "aasIds": "*"
+    }
+  },
+  {
+    "role": "basyx-submodel-reader",
+    "action": [
+      "READ"
+    ],
+    "targetInformation": {
+      "@type": "submodel",
+      "submodelIds": "*",
+      "submodelElementIdShortPaths": "*"
+    }
+  },
+  {
+    "role": "mnestix-aas-reader",
+    "action": [
+      "READ"
+    ],
+    "targetInformation": {
+      "@type": "aas",
+      "aasIds": "https://vws.xitaso.com/aas/mnestix"
+    }
+  },
+  {
+    "role": "mnestix-submodel-reader",
+    "action": [
+      "READ"
+    ],
+    "targetInformation": {
+      "@type": "submodel",
+      "submodelIds": [
+        "https://vws.xitaso.com/sm/nameplate/5240_8927_2203_5742",
+        "https://vws.xitaso.com/sm/swnameplate/4386_8596_1428_5257",
+        "https://vws.xitaso.com/sm/booth_bill_of_material",
+        "https://example.com/ids/sm/7791_1307_3131_5873"
+      ],
+      "submodelElementIdShortPaths": "*"
+    }
+  }
+]

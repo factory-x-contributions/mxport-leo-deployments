@@ -1,0 +1,95 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
+{{- if .Values.mnestixBrowser.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-browser") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mnestix-browser") | nindent 4 }}
+spec:
+  type: {{ .Values.mnestixBrowser.service.type }}
+  selector:
+    {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mnestix-browser") | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.mnestixBrowser.service.port }}
+      targetPort: http
+      protocol: TCP
+{{- end }}
+{{- if .Values.mnestixProxy.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-proxy") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mnestix-proxy") | nindent 4 }}
+spec:
+  type: {{ .Values.mnestixProxy.service.type }}
+  selector:
+    {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mnestix-proxy") | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.mnestixProxy.service.port }}
+      targetPort: http
+      protocol: TCP
+{{- end }}
+{{- if .Values.keycloak.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "keycloak") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "keycloak") | nindent 4 }}
+spec:
+  type: {{ .Values.keycloak.service.type }}
+  selector:
+    {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "keycloak") | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.keycloak.service.httpPort }}
+      targetPort: http
+      protocol: TCP
+    - name: https
+      port: {{ .Values.keycloak.service.httpsPort }}
+      targetPort: https
+      protocol: TCP
+{{- end }}
+{{- if .Values.mongodb.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mongodb") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mongodb") | nindent 4 }}
+spec:
+  type: {{ .Values.mongodb.service.type }}
+  selector:
+    {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "mongodb") | nindent 4 }}
+  ports:
+    - name: mongodb
+      port: {{ .Values.mongodb.service.port }}
+      targetPort: mongodb
+      protocol: TCP
+{{- end }}
+{{- if .Values.aasEnvironment.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "aas-environment") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "aas-environment") | nindent 4 }}
+spec:
+  type: {{ .Values.aasEnvironment.service.type }}
+  selector:
+    {{- include "mnestix-tokenexchange-basyx-auth.selectorLabels" (dict "root" . "component" "aas-environment") | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.aasEnvironment.service.port }}
+      targetPort: http
+      protocol: TCP
+{{- end }}

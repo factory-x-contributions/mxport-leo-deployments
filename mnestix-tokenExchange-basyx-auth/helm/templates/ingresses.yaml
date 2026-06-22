@@ -1,0 +1,109 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
+{{- if and .Values.mnestixBrowser.enabled .Values.mnestixBrowser.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-browser") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mnestix-browser") | nindent 4 }}
+  {{- with .Values.mnestixBrowser.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.mnestixBrowser.ingress.className }}
+  ingressClassName: {{ .Values.mnestixBrowser.ingress.className }}
+  {{- end }}
+  rules:
+    {{- range .Values.mnestixBrowser.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" $ "component" "mnestix-browser") }}
+                port:
+                  number: {{ $.Values.mnestixBrowser.service.port }}
+          {{- end }}
+    {{- end }}
+  {{- with .Values.mnestixBrowser.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- if and .Values.mnestixProxy.enabled .Values.mnestixProxy.ingress.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "mnestix-proxy") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mnestix-proxy") | nindent 4 }}
+  {{- with .Values.mnestixProxy.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.mnestixProxy.ingress.className }}
+  ingressClassName: {{ .Values.mnestixProxy.ingress.className }}
+  {{- end }}
+  rules:
+    {{- range .Values.mnestixProxy.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" $ "component" "mnestix-proxy") }}
+                port:
+                  number: {{ $.Values.mnestixProxy.service.port }}
+          {{- end }}
+    {{- end }}
+  {{- with .Values.mnestixProxy.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- if and .Values.keycloak.enabled .Values.keycloak.ingress.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" . "component" "keycloak") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "keycloak") | nindent 4 }}
+  {{- with .Values.keycloak.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.keycloak.ingress.className }}
+  ingressClassName: {{ .Values.keycloak.ingress.className }}
+  {{- end }}
+  rules:
+    {{- range .Values.keycloak.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "mnestix-tokenexchange-basyx-auth.componentName" (dict "root" $ "component" "keycloak") }}
+                port:
+                  number: {{ $.Values.keycloak.service.httpPort }}
+          {{- end }}
+    {{- end }}
+  {{- with .Values.keycloak.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

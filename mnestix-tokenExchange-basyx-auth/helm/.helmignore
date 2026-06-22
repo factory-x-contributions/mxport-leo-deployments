@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
+# VCS and editor files
+.git/
+.vscode/
+
+# Local run artifacts
+compose.yml
+wiki/
+
+# Build output not needed in chart package
+keycloak/initializer/target/

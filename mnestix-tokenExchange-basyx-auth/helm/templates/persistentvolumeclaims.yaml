@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
+{{- if and .Values.mnestixBrowser.enabled .Values.mnestixBrowser.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentDataPvcName" (dict "root" . "component" "mnestix-browser") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mnestix-browser") | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml .Values.mnestixBrowser.persistence.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.mnestixBrowser.persistence.size }}
+  {{- if .Values.mnestixBrowser.persistence.storageClass }}
+  storageClassName: {{ .Values.mnestixBrowser.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}
+{{- if and .Values.mongodb.enabled .Values.mongodb.persistence.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mnestix-tokenexchange-basyx-auth.componentDataPvcName" (dict "root" . "component" "mongodb") }}
+  labels:
+    {{- include "mnestix-tokenexchange-basyx-auth.labels" (dict "root" . "component" "mongodb") | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml .Values.mongodb.persistence.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.mongodb.persistence.size }}
+  {{- if .Values.mongodb.persistence.storageClass }}
+  storageClassName: {{ .Values.mongodb.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}

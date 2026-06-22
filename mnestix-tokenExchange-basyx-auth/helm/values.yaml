@@ -1,0 +1,189 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2025 XITASO GmbH
+nameOverride: ""
+fullnameOverride: ""
+
+imagePullSecrets: []
+
+global:
+  podAnnotations: {}
+
+secrets:
+  backendApiKey: verySecureApiKey
+  nextAuthSecret: verySecureNextAuthSecret
+  secretEncKey: J+mMxwKo+aoFJ6uxMv6Acv54buuBir2EJ3z6LGFB+Vo=
+
+mnestixBrowser:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: mnestix/mnestix-browser
+    tag: "2.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+  resources: {}
+  env:
+    registryApiUrl: https://aas-registry:8083/
+    submodelRegistryApiUrl: http://submodel-registry:8084
+    discoveryApiUrl: ""
+    aasRepoApiUrl: ""
+    submodelRepoApiUrl: ""
+    conceptDescriptionRepoApiUrl: ""
+    serializationApiUrl: ""
+    aasGeneratorApiUrl: ""
+    aasListFeatureFlag: "true"
+    transferFeatureFlag: "false"
+    comparisonFeatureFlag: "true"
+    productViewFeatureFlag: "false"
+    authenticationFeatureFlag: "true"
+    nextAuthUrl: http://localhost:3000
+    keycloakEnabled: "true"
+    keycloakClientId: mnestix-browser-client-demo
+    keycloakIssuer: ""
+    keycloakLocalUrl: http://localhost:8080
+    keycloakRealm: Mnestix
+    lockTimeseriesPeriodFeatureFlag: "true"
+    imprintUrl: ""
+    dataPrivacyUrl: ""
+    basyxRbacEnabled: "false"
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: mnestix-browser.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+mnestixProxy:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: mnestix/mnestix-proxy
+    tag: "1.0.0-fx"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 5065
+  resources: {}
+  env:
+    azureAdEnableAzureAdAuth: "false"
+    openIdEnableOpenIdAuth: "true"
+    openIdIssuer: ""
+    openIdClientId: mnestixApi-demo
+    openIdRequireHttpsMetadata: "false"
+    aspNetCoreUrls: http://+:5065
+  health:
+    path: /health
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: mnestix-proxy.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+keycloak:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: mnestix/keycloak-fx
+    tag: "24.0.4"
+    pullPolicy: IfNotPresent
+  command:
+    - /opt/keycloak/bin/kc.sh
+    - start-dev
+    - --import-realm
+  auth:
+    adminUser: admin
+    adminPassword: admin
+  service:
+    type: ClusterIP
+    httpPort: 8080
+    httpsPort: 8443
+  resources: {}
+  env:
+    hostname: localhost
+    spiInitializerIssuerBaseUri: ""
+    healthEnabled: "true"
+    httpEnabled: "true"
+    httpsCertificateFile: /opt/keycloak/conf/server.crt
+    httpsCertificateKeyFile: /opt/keycloak/conf/server.key
+  tlsSecret:
+    create: true
+    name: ""
+    crt: ""
+    key: ""
+    crtFile: files/keycloak/certs/server.crt
+    keyFile: files/keycloak/certs/server.key
+  realm:
+    name: Mnestix
+    createConfigMap: true
+    configMapName: ""
+    fileName: Mnestix-realm.json
+    sourceFile: files/keycloak/realm/Mnestix-realm.json
+    content: ""
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: keycloak.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+mongodb:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: mongo
+    tag: "8"
+    pullPolicy: IfNotPresent
+  auth:
+    rootUsername: mongoAdmin
+    rootPassword: mongoPassword
+  service:
+    type: ClusterIP
+    port: 27017
+  persistence:
+    enabled: true
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+  resources: {}
+
+aasEnvironment:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: eclipsebasyx/aas-environment
+    tag: 2.0.0-milestone-06
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8081
+  resources: {}
+  env:
+    backend: MongoDB
+    mongodbDatabase: basyxdb
+    mongodbAuthDatabase: admin
+    maxFileSize: 100000KB
+    maxRequestSize: 100000KB
+    corsAllowedOrigins: "*"
+    corsAllowedMethods: GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
