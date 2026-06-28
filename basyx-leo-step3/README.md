@@ -14,6 +14,34 @@ Exemplary Helm deployments for a Factory-X data **consumer** and data **provider
 
 The client sends a single request to the **consumer gateway** with its local Keycloak token. The consumer gateway exchanges that token at the consumer STS for a Factory-X token and forwards the request to the provider gateway. The provider gateway exchanges the FX token at the provider STS for a BaSyx-scoped token and forwards the request to BaSyx.
 
+## Gateways
+
+Both gateways run [OpenResty](https://openresty.org/) (nginx + LuaJIT) with a custom Lua STS module (`ghcr.io/factory-x-contributions/mxport-leo-gateway:openresty-sts-module`). On every inbound request the Lua code calls the local STS, receives a short-lived exchanged token, and places it in the `Authorization` header before proxying the request upstream. Exchanged tokens are cached in a 10 MB shared Lua dictionary (`sts_token_cache`) to avoid a round-trip to the STS on every request.
+
+**Consumer gateway URL structure**
+
+The consumer gateway exposes a single route template:
+
+```
+/external/<provider-host>/<path>
+```
+
+The `<provider-host>` segment is extracted from the URL and validated against a strict exact-match allowlist configured in `nginx.conf` (`allowed_providers`). Any host not on the list receives an immediate `403` before the STS is ever contacted. If the host is allowed, the gateway exchanges the incoming Keycloak bearer token for an FX token (audience = `<provider-host>`) and proxies the request to `https://<provider-host>/<path>`.
+
+The provider gateway receives this request and exchanges it for a BaSyx-scoped token via the provider STS, which also validates the FX token against the consumer STS JWKS (`https://<consumer-sts-host>/sts/jwks`), and forwards the request to BaSyx with that final token.
+
+**Allowlist**
+
+The allowlist lives in `charts/consumer-deployment/charts/gateway-sts/config/nginx.conf` as a Lua table:
+
+```lua
+allowed_providers = {
+  ["<provider-gateway-host>"] = true,
+}
+```
+
+Add entries here to permit additional provider gateways. The provider hostname also needs to appear as the `audience` in the consumer STS `filterConfig` in `consumer-deployment/values.yaml`.
+
 ## Prerequisites
 
 - A Kubernetes cluster with an `nginx` IngressClass and `cert-manager` configured with a `letsencrypt-prod` ClusterIssuer (or adjust the ingress annotations in both `values.yaml` files to match your setup)
@@ -93,6 +121,6 @@ A successful step 2 (any 2xx/3xx) confirms the full chain: Keycloak → consumer
 
 - **401 at step 2 (from consumer gateway)** — the consumer STS could not verify the Keycloak token. Check that `serverConfig.issuerSpecificConfiguration[].issuer` and `jwksUri` in `consumer-deployment/values.yaml` resolve to the deployed Keycloak realm.
 - **401 at step 2 (from provider gateway)** — the provider STS rejected the FX token. Verify the consumer STS host is reachable from the provider cluster (the provider fetches the consumer's JWKS at `https://<consumer sts-host>/sts/jwks`) and that the token audience matches on both sides.
-- **403 from provider gateway** — the provider hostname is not in the consumer gateway's allowlist. Check `gateway-sts.config` in `consumer-deployment/values.yaml`.
+- **403 from provider gateway** — the provider hostname is not in the consumer gateway's allowlist. Check the `allowed_providers` table in `charts/consumer-deployment/charts/gateway-sts/config/nginx.conf` and ensure the same hostname appears as `audience` in the consumer STS `filterConfig`.
 - **403 from BaSyx** — token reached BaSyx but the subject lacks the required RBAC role. Roles are defined in `provider-deployment/values.yaml` under `aas-basyx-v2-full.aas-environment.rbac.rules`; map them onto your Keycloak client/users as needed.
 - **`ImagePullBackOff`** — the `dockerconfigjson` value is missing or not base64-encoded.
